@@ -1,0 +1,103 @@
+{
+  "name": "reactory-core",
+  "version": "1.0.0",
+  "description": "Reactory Core Plugin.",
+  "main": "src/index.js",
+  "author": "W Weber",
+  "license": "Apache-2.0",
+  "homepage": "https://bitbucket.org/reactory/reactory-core-client-plugin#readme",
+  "scripts": {
+    "build": "npx babel src --out-file lib/reactory.core.js",
+    "start": "NODE_PATH=./src npx nodemon --exec npx babel-node ./src/index.js",
+    "rollup": "rollup --config rollup.config.dev.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run release",
+    "release": "npm run build:dev && npm run build:prod",
+    "build:dev": "NODE_ENV=development rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "core-js": "^3.1.4",
+    "styled-jsx": ">= 3.x.x"
+  },
+  "peerDependencies": {
+    "react": ">= 16.13.x",
+    "react-dom": ">= 16.13.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/reactory/reactory-core-client-plugin.git"
+  },
+  "keywords": [
+    "reactory",
+    "core",
+    "client",
+    "plugin"
+  ],
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*",
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "delay": "2500",
+    "verbose": true
+  },
+  "devDependencies": {
+    "@babel/cli": "7.4.4",
+    "@babel/core": "7.4.4",
+    "@babel/eslint-plugin-development": "1.0.1",
+    "@babel/plugin-proposal-class-properties": "7.4.0",
+    "@babel/plugin-proposal-decorators": "7.4.4",
+    "@babel/plugin-proposal-do-expressions": "7.2.0",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-proposal-export-namespace-from": "7.2.0",
+    "@babel/plugin-proposal-function-bind": "7.2.0",
+    "@babel/plugin-proposal-function-sent": "7.2.0",
+    "@babel/plugin-proposal-json-strings": "7.2.0",
+    "@babel/plugin-proposal-logical-assignment-operators": "7.2.0",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.4.4",
+    "@babel/plugin-proposal-numeric-separator": "7.2.0",
+    "@babel/plugin-proposal-optional-chaining": "7.2.0",
+    "@babel/plugin-proposal-pipeline-operator": "7.3.2",
+    "@babel/plugin-proposal-throw-expressions": "7.2.0",
+    "@babel/plugin-syntax-class-properties": "7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
+    "@babel/plugin-syntax-import-meta": "7.2.0",
+    "@babel/plugin-transform-arrow-functions": "^7.2.0",
+    "@babel/plugin-transform-classes": "7.4.4",
+    "@babel/plugin-transform-modules-commonjs": "7.4.3",
+    "@babel/plugin-transform-object-set-prototype-of-to-assign": "7.2.0",
+    "@babel/plugin-transform-react-constant-elements": "^7.2.0",
+    "@babel/plugin-transform-react-inline-elements": "7.2.0",
+    "@babel/plugin-transform-react-jsx": "7.3.0",
+    "@babel/plugin-transform-react-jsx-compat": "^7.2.0",
+    "@babel/plugin-transform-runtime": "7.4.4",
+    "@babel/plugin-transform-typescript": "7.4.0",
+    "@babel/preset-env": "7.4.4",
+    "@babel/preset-react": "7.0.0",
+    "@babel/preset-typescript": "^7.6.0",
+    "@babel/runtime": "7.4.3",
+    "@rollup/plugin-typescript": "^8.1.0",
+    "@storybook/addon-actions": "^5.1.9",
+    "@storybook/addon-links": "^5.1.9",
+    "@storybook/addons": "^5.1.9",
+    "@storybook/react": "^5.1.9",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-add-module-exports": "1.0.2",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "rollup": "^1.2.2",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "styled-jsx": "^3.2.1",
+    "typescript": "^4.1.3"
+  }
+}
