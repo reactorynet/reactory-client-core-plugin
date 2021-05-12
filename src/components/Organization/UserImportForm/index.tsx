@@ -53,6 +53,7 @@ const UserImportForm = (props: any) => {
     <ReactoryForm
       formDef={UserImportFormDefinition}
       mode={'edit'}
+      organization={organization}
       formData={{ organization_id: organization.id }}
       onBeforeMutation={onBeforeMutation}
       onMutateComplete={onMutateComplete}
