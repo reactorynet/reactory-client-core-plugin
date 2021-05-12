@@ -5,7 +5,7 @@
  */
 
 const UserFileImportStatus = (props) => {
-  debugger;
+  
   const { reactory, id, status, workload_id, organization_id, } = props;
   const { React, MaterialCore } = reactory.getComponents(['react.React', 'material-ui.MaterialCore']);
   const { useState, useEffect } = React;
@@ -21,7 +21,7 @@ const UserFileImportStatus = (props) => {
     /**
      * The query below consitutes the full object for the file import
      */
-    debugger
+
 
     const query = `query ReactoryFileImportPackage($organization_id: String!, $workload_id: String, $file_ids: [String]){
   ReactoryFileImportPackage(organization_id: $organization_id, workload_id: $workload_id) {
@@ -60,7 +60,7 @@ const UserFileImportStatus = (props) => {
 
     try {
       const variables = { workload_id, organization_id, file_ids: [id] };
-      debugger
+
       const { data, errors = [] } = await reactory.graphqlQuery(query, variables).then();
 
       if (errors.length > 0) {

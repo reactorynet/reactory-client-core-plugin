@@ -44,7 +44,6 @@ const UserImportForm = (props: any) => {
   }
 
   const onMutateComplete = (workload, context, { data, errors = [] }) => {
-    debugger;
 
     if (onImportSuccess) onImportSuccess(true);
   };
