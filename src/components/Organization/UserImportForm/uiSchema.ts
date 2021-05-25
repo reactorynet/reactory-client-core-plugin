@@ -3,12 +3,12 @@ const uiSchema: any = {
     submitIcon: 'task_alt',
     showSubmit: true,
     showHelp: true,
-    showRefresh: true,
+    showRefresh: false,
   },
   'ui:field': 'TabbedLayout',
   'ui:tab-layout': [
-    { field: 'options' },
     { field: 'sources' },
+    { field: 'options' },
   ],
 
   options: {

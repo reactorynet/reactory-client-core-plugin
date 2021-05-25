@@ -9,7 +9,7 @@ const UserImportFormDefinition = {
   name: 'UserImportForm',
   uiFramework: 'material',
   uiSupport: ['material'],
-  helpTopics: ['core-user-import-form'],
+  helpTopics: ['core-user-import-form', 'csv-import-general'],
   schema,
   graphql,
   uiSchema,
