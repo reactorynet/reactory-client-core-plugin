@@ -1,7 +1,7 @@
 {
-  "name": "reactory-core",
+  "name": "@reactory/client-core-plugin",
   "version": "1.0.0",
-  "description": "Reactory Core Plugin.",
+  "description": "Reactory Client Core Plugin.",
   "main": "src/index.js",
   "author": "W Weber",
   "license": "Apache-2.0",
@@ -9,22 +9,23 @@
   "scripts": {
     "build": "npx babel src --out-file lib/reactory.core.js",
     "start": "NODE_PATH=./src npx nodemon --exec npx babel-node ./src/index.js",
-    "rollup": "rollup --config rollup.config.dev.js",
+    "rollup": "rollup --config rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "npm run release",
     "release": "npm run build:dev && npm run build:prod",
-    "build:dev": "NODE_ENV=development rollup -c",
-    "build:prod": "NODE_ENV=production rollup -c",
+    "build:dev": "NODE_ENV=development rollup --config rollup.config.js",
+    "build:prod": "NODE_ENV=production rollup --config rollup.config.js",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@reactory/reactory-core": "file:../artifacts/reactory-reactory-core-1.0.0.tgz",
     "core-js": "^3.1.4",
     "styled-jsx": ">= 3.x.x"
   },
   "peerDependencies": {
-    "react": ">= 16.13.x",
-    "react-dom": ">= 16.13.x"
+    "react": ">= 17.0.x",
+    "react-dom": ">= 17.0.x"
   },
   "repository": {
     "type": "git",
@@ -47,7 +48,7 @@
     "verbose": true
   },
   "devDependencies": {
-    "@babel/cli": "7.4.4",
+    "@babel/cli": "^7.17.6",
     "@babel/core": "7.4.4",
     "@babel/eslint-plugin-development": "1.0.1",
     "@babel/plugin-proposal-class-properties": "7.4.0",
@@ -81,16 +82,21 @@
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "^7.6.0",
     "@babel/runtime": "7.4.3",
+    "@emotion/core": "10.3.1",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "5.6.1",
+    "@mui/lab": "5.0.0-alpha.77",
+    "@mui/material": "5.6.1",
+    "@mui/styles": "5.6.1",
+    "@mui/types": "7.1.2",
     "@rollup/plugin-typescript": "^8.1.0",
-    "@storybook/addon-actions": "^5.1.9",
-    "@storybook/addon-links": "^5.1.9",
-    "@storybook/addons": "^5.1.9",
-    "@storybook/react": "^5.1.9",
+    "@storybook/addon-actions": "6.4.22",
+    "@storybook/addon-links": "6.4.22",
+    "@storybook/addons": "6.4.22",
+    "@storybook/react": "^6.1.21",
     "babel-loader": "^8.0.6",
-    "babel-plugin-add-module-exports": "1.0.2",
+    "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-module-resolver": "^3.2.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
     "rollup": "^1.2.2",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.1",

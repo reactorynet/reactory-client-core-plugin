@@ -8,10 +8,10 @@ const jsx = require('rollup-plugin-jsx');
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-const outputFile = NODE_ENV === "production" ? "./lib/reactory.core.js" : "./lib/reactory.core.js";
+const outputFile = NODE_ENV === "production" ? "./lib/reactory.client.core.min.js" : "./lib/reactory.client.core.js";
 
 export default {
-  input: "./src/index.js",
+  input: "./src/index.ts",
   output: {
     file: outputFile,
     format: "umd",
@@ -21,7 +21,7 @@ export default {
   },  
   plugins: [
     replace({
-      'process.env.NODE_ENV': JSON.stringify('development')
+      'process.env.NODE_ENV': JSON.stringify(NODE_ENV || "development")
     }),
     commonjs({
       include: 'node_modules/**',

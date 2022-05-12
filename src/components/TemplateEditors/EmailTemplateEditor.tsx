@@ -1,6 +1,6 @@
-import React from 'react';
 import { nameSpace } from '../../constants';
-
+import Reactory from '@reactory/reactory-core'
+import { IReactoryComponentProps } from '@reactory/reactory-core/src/types';
 const dependencies = [
   'material-ui.Material',
   'core.ReactoryForm',
@@ -280,7 +280,7 @@ export const ReactoryEmailTemplateEditorErrorHandler = (props, context) => {
   }
 }
 
-export const ReactoryEmailTemplateEditor = {
+export const ReactoryEmailTemplateEditor: Reactory.Forms.IReactoryForm = {
   id: "ReactoryEmailTemplateEditor",
   nameSpace: 'reactory-core',
   name: "ReactoryEmailTemplateEditorForm",
@@ -303,64 +303,72 @@ export const ReactoryEmailTemplateEditor = {
   queryStringMap: {}
 };
 
-class EmailTemplateEditor extends React.Component {
+// const EmailTemplateEditor =  {
+//   components: [];
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      loaded: false
-    }
+//   constructor(props) {
+//     super(props)
+//     this.state = {
+//       loaded: false
+//     }
 
-    const { api } = props;
+//     const { reactory } = props;
 
-    this.components = api.getComponents(dependencies);
-    this.mutateComplete = this.mutateComplete.bind(this);
-    this.queryComplete = this.queryComplete.bind(this);
-  }
+//     this.components = reactory.getComponents(dependencies);
+//     this.mutateComplete = this.mutateComplete.bind(this);
+//     this.queryComplete = this.queryComplete.bind(this);
+//   }
 
-  queryComplete({ formData, formContext, result, errors }) {
-    const { api } = this.props;
-    api.log('Email Template Editor Query Complete', { formData, formContext, result, errors }, 'debug');        
-  }
+//   queryComplete({ formData, formContext, result, errors }) {
+//     const { api } = this.props;
+//     api.log('Email Template Editor Query Complete', { formData, formContext, result, errors }, 'debug');        
+//   }
 
-  mutateComplete(formData, formContext, result) {
-    const { api } = this.props;
-    api.log('Email Template Editor Mutation Complete', { formData, formContext, result }, 'debug');
+//   mutateComplete(formData, formContext, result) {
+//     const { api } = this.props;
+//     api.log('Email Template Editor Mutation Complete', { formData, formContext, result }, 'debug');
 
-    api.createNotification(`Template ${formData.name} saved. ✅`, { type: 'success', showInAppNotification: true, canDismiss: true, timeout: 2500 });
-  }
+//     api.createNotification(`Template ${formData.name} saved. ✅`, { type: 'success', showInAppNotification: true, canDismiss: true, timeout: 2500 });
+//   }
 
 
-  render() {
-    try {
+//   render() {
+//     try {
 
-      const { api,
-        formDef = {},
-        view = 'reactory-core.WelcomeEmailTemplate@1.0.0',
-      } = this.props;
+//       const { api,
+//         formDef = {},
+//         view = 'reactory-core.WelcomeEmailTemplate@1.0.0',
+//       } = this.props;
 
-      const { Material, ReactoryForm } = this.components;
-      const { MaterialCore, MaterialStyles } = Material;
-      const { Grid, Icon, TextField } = MaterialCore;
+//       const { Material } = this.components;
+//       const { MaterialCore, MaterialStyles } = Material;
+//       const { Grid, Icon, TextField } = MaterialCore;
 
-      const composedForm = { ...ReactoryEmailTemplateEditor, ...formDef };
+//       const composedForm = { ...ReactoryEmailTemplateEditor, ...formDef };
+//       const ReactoryForm: React.FunctionComponent = this.components.ReactoryForm as React.FunctionComponent
+//       return (
 
-      return (
+//         <ReactoryForm
+//           formDef={composedForm}
+//           onMutateComplete={this.mutateComplete}
+//           onQueryComplete={this.queryComplete}
+//           formData={{ view }}
+//           mode={'edit'} />
+//       )
+//     } catch (renderError) {
 
-        <ReactoryForm
-          formDef={composedForm}
-          onMutateComplete={this.mutateComplete}
-          onQueryComplete={this.queryComplete}
-          formData={{ view }}
-          mode={'edit'}
-        />
-      )
-    } catch (renderError) {
+//       return <>💥{renderError.message}</>
+//     }
+//   }
+// }
 
-      return <>💥{renderError.message}</>
-    }
-  }
+const EmailTemplateEditor = (props: IReactoryComponentProps) => {
+
+  const { reactory } = props;
+    
+  return <>WORK IN PROGRESS</>
 }
+
 
 export default {
   nameSpace,
