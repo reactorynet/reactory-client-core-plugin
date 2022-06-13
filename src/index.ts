@@ -6,7 +6,10 @@ const REACTORY_CORE_PLUGIN = (props) => {
 
 }
 
+
+
 REACTORY_CORE_PLUGIN.install = function( api ){
+  
   api.log("Installing Reactory Core Plugin");
   api.registerComponent('reactory-core', 'ReactoryCoreClientPlugin', '1.0.0', REACTORY_CORE_PLUGIN);
   
