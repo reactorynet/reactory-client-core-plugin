@@ -14,9 +14,10 @@ export default (props) => {
     show_selector = false,
   } = props;
 
-  const { React, ReactRouter, MaterialCore, MaterialStyles, AlertDialog } =
+  debugger
+  const { React, ReactRouterDom, MaterialCore, MaterialStyles, AlertDialog } =
     reactory.getComponents([
-      'react-router.ReactRouter',
+      'react-router.ReactRouterDom',
       'react.React',
       'material-ui.MaterialCore',
       'material-ui.MaterialStyles',
@@ -24,8 +25,8 @@ export default (props) => {
     ]);
 
   const { useState, useEffect } = React;
-  const { useParams } = ReactRouter;
-  const { organization_id = 'default' } = ReactRouter.useParams();
+  const { useParams } = ReactRouterDom;
+  const { organization_id = 'default' } = ReactRouterDom.useParams();
   const {
     Avatar,
     Typography,
@@ -55,6 +56,7 @@ export default (props) => {
     reactory,
     active_organization_id: organization_id,
     onLoadComplete: (organisation, organisations) => {
+      debugger
       if (loaded === false) {
         if (unloading === false) {
           setIsLoaded(true);
@@ -66,9 +68,12 @@ export default (props) => {
   }));
 
   useEffect(() => {
-    if (unloading === false) {
-      provider.setActiveOrganisation(organization_id)
-      setVersion(version + 1)
+    if (unloading === false && loaded === true) {
+      debugger
+      if(organisation.id !== organization_id) {
+        provider.setActiveOrganisation(organization_id)
+        setVersion(version + 1)
+      }
     }
   }, [organization_id]);
 
@@ -81,7 +86,10 @@ export default (props) => {
 
   useEffect(() => {    
     if(onOrganizationChanged && organisation) {
-      if(organisation && organisation.id !== 'default') onOrganizationChanged(organisation);
+      if(organisation && organisation.id !== 'default' && organisation.id !== "loading" && organization_id !== organisation.id) {
+        onOrganizationChanged(organisation);
+      }
+
     }
   }, [organisation])
 
