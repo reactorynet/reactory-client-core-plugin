@@ -81,7 +81,7 @@ export default (props) => {
 
   useEffect(() => {    
     if(onOrganizationChanged && organisation) {
-      onOrganizationChanged(organisation);
+      if(organisation && organisation.id !== 'default') onOrganizationChanged(organisation);
     }
   }, [organisation])
 
