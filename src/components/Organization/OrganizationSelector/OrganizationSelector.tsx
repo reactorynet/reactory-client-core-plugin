@@ -1,20 +1,33 @@
 import Queries from './queries';
-import Models from './models';
+import Models, { CoreOrganisationModel } from './models';
 const {
   LoggedInOrganisationQuery,
   CoreOrganizations,
   SetActiveOrganisationMutation,
 } = Queries;
 
-export default (props) => {
+export type OrganizationSelectorProps = {
+  reactory: Reactory.Client.IReactoryApi,
+  onOrganizationChanged: (organization: CoreOrganisationModel) => void,
+  variant: string,
+  show_selector: boolean
+}
+
+export interface CoreSetOranizationResult {
+  success: boolean
+  message: boolean
+  organization: Reactory.Models.IOrganization
+}
+
+export default (props: OrganizationSelectorProps) => {
   const {
     reactory,
     onOrganizationChanged,
-    variant = 'avatar,label,default,toggle,new',    
+    variant = 'avatar,label,default,toggle,new',
     show_selector = false,
   } = props;
 
-  debugger
+
   const { React, ReactRouterDom, MaterialCore, MaterialStyles, AlertDialog } =
     reactory.getComponents([
       'react-router.ReactRouterDom',
@@ -51,12 +64,13 @@ export default (props) => {
   const [organisations, setOrganisations] = useState([Models.LoadingOrganisation]);
   const [unloading, setIsUnloading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [showNewOrganizationDialog, setShowNewOrganizationDialog] = useState(false);
+  const [newOrganizationName, setNewOrganizationName] = useState("");
 
   const [provider] = useState(new Models.CoreOrganizationList({
     reactory,
     active_organization_id: organization_id,
     onLoadComplete: (organisation, organisations) => {
-      debugger
       if (loaded === false) {
         if (unloading === false) {
           setIsLoaded(true);
@@ -70,7 +84,7 @@ export default (props) => {
   useEffect(() => {
     if (unloading === false && loaded === true) {
       debugger
-      if(organisation.id !== organization_id) {
+      if (organisation.id !== organization_id) {
         provider.setActiveOrganisation(organization_id)
         setVersion(version + 1)
       }
@@ -84,9 +98,9 @@ export default (props) => {
     };
   }, [])
 
-  useEffect(() => {    
-    if(onOrganizationChanged && organisation) {
-      if(organisation && organisation.id !== 'default' && organisation.id !== "loading" && organization_id !== organisation.id) {
+  useEffect(() => {
+    if (onOrganizationChanged && organisation) {
+      if (organisation && organisation.id !== 'default' && organisation.id !== "loading" && organization_id !== organisation.id) {
         onOrganizationChanged(organisation);
       }
 
@@ -177,6 +191,8 @@ export default (props) => {
       );
     });
 
+    if (showOrganisationSelector === false) return null;
+
     return (
       <AlertDialog
         open={showOrganisationSelector === true}
@@ -186,8 +202,7 @@ export default (props) => {
         onClose={() => setShowOrganisationSelector(false)}
         cancelTitle='Close'
         showAccept={false}
-        cancelProps={{ variant: 'text', color: '#00b100' }}
-        confirmProps={{ variant: 'text', color: '#F50000' }}>
+        cancelProps={{}}>
         <Paper elevation={1} className={classes.image_container}>
           <List
             component='nav'
@@ -200,6 +215,7 @@ export default (props) => {
       </AlertDialog>
     );
   };
+
 
   //const LoggedInOrganisationButton = () => {
 
@@ -219,7 +235,7 @@ export default (props) => {
   };
 
   const onNewOrganization = () => {
-
+    setShowNewOrganizationDialog(true);
   }
 
   const tooltip_title =
@@ -235,7 +251,47 @@ export default (props) => {
 
   const display_selectOrgButton =
     variant.indexOf('selectOrganisationButton') >= 0;
-  
+
+    /**
+     * shortcut / helper function that executes organization 
+     * creation
+     */
+  const createOrganization = () => {
+
+    //helper interfaces 
+    interface CreateOrganizationVariable {
+      id: string
+      name: string
+    }
+
+    interface CreateOrganizationMutationResult {
+      CoreSetOrganisationInfo: CoreSetOranizationResult
+    }
+
+    
+    reactory.graphqlMutation<CreateOrganizationMutationResult, 
+      CreateOrganizationVariable>(Queries.CoreSetOrganisationInfo, 
+        { id: 'new', name: newOrganizationName }).then((result) => {
+      const { data, errors = [] } = result;
+
+      if (data && data.CoreSetOrganisationInfo) {
+        const { organization, success, message } = data.CoreSetOrganisationInfo;
+        reactory.createNotification(`${message}`, { type: success === true ? 'success' : 'error' })
+        onOrganizationChanged(new Models.CoreOrganisationModel({ reactory, ...organization }));
+        setShowNewOrganizationDialog(false);
+      }
+
+      if (errors.length > 0) {
+        reactory.createNotfication('Errors reported during organization creation, please check error log for details');
+        reactory.log('Errors reported from graphql', errors, 'error')
+      }
+    });
+  }
+
+  const onNewOrganizationNameChange = (evt) => {
+    setNewOrganizationName(evt.target.value)
+  }
+
   return (
     <div className={classes.logged_in_organisation}>
       {display_selectOrgButton && (<Button onClick={onOrganisationSelectorClick} variant='outlined' color='primary'>Select Organisation</Button>)}
@@ -244,6 +300,24 @@ export default (props) => {
       {display_default && has_multiple === true ? <Tooltip title={tooltip_title}><Icon onClick={onFavoriteOrganisation} className={`${classes.favorite_icon} ${provider.organisation.id === provider.default_organisation_id ? classes.favorite_selected : ''}`}>verified</Icon></Tooltip> : null}
       {display_toggle && has_multiple === true && onOrganizationChanged ? <IconButton onClick={onOrganisationSelectorClick}><Icon>more_vert</Icon></IconButton> : null}
       {display_new && <IconButton onClick={onNewOrganization}><Icon>add</Icon></IconButton>}
+      <AlertDialog
+        open={showNewOrganizationDialog === true}
+        title={`Create new organization`}
+        content={`Click anywhere outside the window to close / cancel the creation`}
+        onAccept={createOrganization}
+        onClose={() => setShowNewOrganizationDialog(false)}
+        cancelTitle='Close'
+        acceptTitle={`ADD ${newOrganizationName}`}
+        showAccept={true}
+        cancelProps={{}}>
+          <MaterialCore.TextField
+            id="newOrganization"
+            label="Organization Name"
+            placeholder="eg: ACME CORP"
+            value={newOrganizationName}
+            fillWidth
+            onChange={onNewOrganizationNameChange} /> 
+      </AlertDialog>
       <SelectOrganisationDialog />
     </div>
   );

@@ -33,9 +33,9 @@ mutation CoreSetActiveOrganisation($id: String!) {
 }
 `;
 
-const SetOrganisationInfo = `
-  mutation MoresSetOrganisationInfo($organisation: MoresOrganisationInput!) {
-    MoresSetOrganisationInfo(organisation: $organisation){
+const CoreSetOrganisationInfo = `
+  mutation CoreSetOrganisationInfo($organisation: CoreOrganisationInput!) {
+    CoreSetOrganisationInfo(organisation: $organisation){
       success
       message
       organisation {
@@ -50,5 +50,5 @@ export default {
   LoggedInOrganisationQuery,
   CoreOrganizations,
   SetActiveOrganisationMutation,
-  SetOrganisationInfo
+  CoreSetOrganisationInfo: CoreSetOrganisationInfo
 };
