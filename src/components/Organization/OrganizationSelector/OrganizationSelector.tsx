@@ -9,8 +9,10 @@ const {
 export type OrganizationSelectorProps = {
   reactory: Reactory.Client.IReactoryApi,
   onOrganizationChanged: (organization: CoreOrganisationModel) => void,
-  variant: string,
-  show_selector: boolean
+  variant?: string,
+  show_selector?: boolean,
+  routeParam?: string,
+  organization_id?: string
 }
 
 export interface CoreSetOranizationResult {
@@ -25,6 +27,7 @@ export default (props: OrganizationSelectorProps) => {
     onOrganizationChanged,
     variant = 'avatar,label,default,toggle,new',
     show_selector = false,
+    routeParam = 'organization_id'
   } = props;
 
 
@@ -39,7 +42,11 @@ export default (props: OrganizationSelectorProps) => {
 
   const { useState, useEffect } = React;
   const { useParams } = ReactRouterDom;
-  const { organization_id = 'default' } = ReactRouterDom.useParams();
+  const params = ReactRouterDom.useParams();
+  let organization_id = params[routeParam];
+  
+  if(props.organization_id && !organization_id) organization_id = props.organization_id;
+  if(!organization_id) organization_id = 'default';
   const {
     Avatar,
     Typography,
