@@ -1,36 +1,54 @@
 {
   "compilerOptions": {
-
-      "noImplicitAny": false,
-      "removeComments": true,
-      "moduleResolution": "node",
-      "allowSyntheticDefaultImports": true,
-      "allowJs": true,  
-      "target":"ES6",
-      "jsx": "preserve",
-      "experimentalDecorators": false,
-      "sourceMap": true,      
-      "skipDefaultLibCheck": true,      
-      "skipLibCheck": true,
-      "strict": false,
-      "lib": ["es6", "dom"],
-      "types": ["webpack-env"],
-      "baseUrl": ".",
-      "noUnusedLocals": false,
-      "noUnusedParameters": false,      
-      "watch": true,
-      "paths": {
-        "*": ["src/*"],
-        "@reactory/core-plugin/*": ["src/*"],
-        "test/*": ["test/*"]
-      },
-      "pretty": true,
-      "typeRoots": ["./node_modules/@types"]      
-  }, 
-  "compileOnSave": true,  
-  "exclude": [ "node_modules", "dist", "build", "config", "scripts" ],
+    "noImplicitAny": false,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "target": "ES2018",
+    "jsx": "preserve",
+    "experimentalDecorators": false,
+    "sourceMap": false,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "baseUrl": ".",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "watch": true,
+    "paths": {
+      "*": [
+        "src/*"
+      ],
+      "@reactory/core-plugin/*": [
+        "src/*"
+      ],
+      "test/*": [
+        "test/*"
+      ]
+    },
+    "pretty": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "config",
+    "scripts"
+  ],
   "include": [
-    "src/**/*",
+    "src/**/*.ts",    
+    "src/**/*.tsx",
     "src/types/**/*.d.ts"
   ]
 }

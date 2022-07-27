@@ -1,6 +1,6 @@
 const schema: any = {
   type: 'object',
-  title: 'Import Users',
+  title: 'Configure Import Package',
   properties: {
     id: {
       type: 'string',
@@ -143,6 +143,14 @@ const schema: any = {
           default: ''
         },
       }
+    },
+    organization: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', title: 'id' },
+        name: { type: 'string', title: 'Organization name' },
+        logo: { type: 'string', title: 'Logo' },
+      },
     },
   }
 };

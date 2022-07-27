@@ -8,7 +8,8 @@ const dependencies = ['material-ui.Material', 'core.ReactoryForm', 'core.DropDow
  * current logged in user has access to.  The source of this list
  * will be based on the memberships of the reactory logged in user.
  */
-class ReactoryBusinessUnitSelector extends React.Component {
+class ReactoryBusinessUnitSelector extends React.Component<any, any> {
+    components: any;
 
     constructor(props) {
         super(props)
@@ -16,16 +17,16 @@ class ReactoryBusinessUnitSelector extends React.Component {
             loaded: false
         }
 
-        const { api } = props;
+        const { reactory } = props;
 
-        this.components = api.getComponents(dependencies);
+        this.components = reactory.getComponents(dependencies);
         this.emailTemplateEditorSubmit = this.emailTemplateEditorSubmit.bind(this);
     }
 
 
     emailTemplateEditorSubmit(formData) {
-        const { api } = this.props;
-        api.log('Email Template Editor Submit', { formData }, 'debug');
+        const { reactory } = this.props;
+        reactory.log('Email Template Editor Submit', { formData }, 'debug');
     }
 
     render() {

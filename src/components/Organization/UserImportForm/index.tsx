@@ -9,7 +9,7 @@ const UserImportFormDefinition = {
   name: 'UserImportForm',
   uiFramework: 'material',
   uiSupport: ['material'],
-  helpTopics: ['core-user-import-form'],
+  helpTopics: ['core-user-import-form', 'csv-import-general'],
   schema,
   graphql,
   uiSchema,
@@ -44,7 +44,6 @@ const UserImportForm = (props: any) => {
   }
 
   const onMutateComplete = (workload, context, { data, errors = [] }) => {
-    debugger;
 
     if (onImportSuccess) onImportSuccess(true);
   };
@@ -53,6 +52,7 @@ const UserImportForm = (props: any) => {
     <ReactoryForm
       formDef={UserImportFormDefinition}
       mode={'edit'}
+      organization={organization}
       formData={{ organization_id: organization.id }}
       onBeforeMutation={onBeforeMutation}
       onMutateComplete={onMutateComplete}

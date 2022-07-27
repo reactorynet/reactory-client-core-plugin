@@ -3,12 +3,12 @@ const uiSchema: any = {
     submitIcon: 'task_alt',
     showSubmit: true,
     showHelp: true,
-    showRefresh: true,
+    showRefresh: false,
   },
   'ui:field': 'TabbedLayout',
   'ui:tab-layout': [
-    { field: 'options' },
     { field: 'sources' },
+    { field: 'options' },
   ],
 
   options: {
@@ -44,9 +44,9 @@ const uiSchema: any = {
           accept: ['text/html', 'text/text', 'application/xml', 'application/pdf'],
           uploadOnDrop: true,
           mutation: {
-            name: 'UserFileImportUpload',
-            text: `mutation UserFileImportUpload($file: Upload!, $options: $CSVImportOptionsInput, $uploadContext: String){
-              UserFileImportUpload(file: $file, uploadContext: $uploadContext) {
+            name: 'AddFileToImportPackage',
+            text: `mutation AddFileToImportPackage($file: Upload!, $workload_id: String!){
+              AddFileToImportPackage(file: $file, workload_id: $workload_id) {
                 id
                 file {
                   id
@@ -55,13 +55,35 @@ const uiSchema: any = {
                   size
                 }
                 status
+                preview {
+                  id
+                  firstName
+                  lastName
+                  email
+                  dob
+                  gender
+                  race
+                  position
+                  region
+                  legalEntity
+                  businessUnit
+                  team
+                }
+                processors {
+                  id
+                  name
+                  order
+                  started
+                  finished
+                }
               }
             }`,
             variables: {
-              'uploadContext': 'core.UserFileImport'
+              'file': 'file',
+              'workload_id': '${props.formContext.$formData.id}',
             },
             onSuccessEvent: {
-              name: 'onUserFileImported'
+              name: 'onFileAddedToImportPackage',
             }
           },
           iconProps: {
@@ -95,10 +117,6 @@ const uiSchema: any = {
             title: 'Status',
             field: 'status',
           },
-          {
-            title: 'Response',
-            field: 'response',
-          }
         ],
         options: {
           grouping: false,
@@ -107,7 +125,11 @@ const uiSchema: any = {
           toolbar: false,
         },
         componentMap: {
-          DetailsPanel: 'core.UserFileImportStatus'
+          DetailsPanel: 'core.UserFileImportStatus@1.0.0'
+        },
+        detailPanelPropsMap: {
+          'formContext.$formData.id': 'workload_id',
+          'formContext.$formData.organization.id': 'organization_id'
         }
       },
     }
