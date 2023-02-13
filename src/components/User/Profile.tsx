@@ -172,21 +172,21 @@ export interface IProfileProps extends Reactory.IReactoryComponentProps {
     isNew: boolean,
     onCancel: () => void,
     onSave: (profile: Reactory.Models.IUser) => void,
-    withPeers: boolean,
-    withAvatar: boolean,
-    withMembership: boolean,
-    withBackButton: boolean,
-    firstNameHelperText: string,
-    surnameHelperText: string,
-    emailHelperText: string,
-    headerComponents: string,
-    footerComponents: string,
-    refetch: () => void
+    withPeers?: boolean,
+    withAvatar?: boolean,
+    withMembership?: boolean,
+    withBackButton?: boolean,
+    firstNameHelperText?: string,
+    surnameHelperText?: string,
+    emailHelperText?: string,
+    headerComponents?: string[],
+    footerComponents?: string[],
+    refetch: () => void,
 }
 
 const Profile = (props: IProfileProps): JSX.Element => {
 
-    const { reactory, loading } = props;
+    const { reactory, loading, withAvatar = true } = props;
 
     const defaultProps = {
         profile: defaultProfile,
@@ -226,7 +226,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
         MaterialTable: React.FunctionComponent<any>,
         UserListWithSearch: React.FunctionComponent<any>
         ReactoryCreateUserMembership: React.FunctionComponent<any>
-        MoresMyPersonalDemographics: React.FunctionComponent<any>
+        MoresMyPersonalDemographics: React.FunctionComponent<any>,
+        UserDemographics: React.FunctionComponent<any>
     }
 
     const components = [
@@ -240,9 +241,10 @@ const Profile = (props: IProfileProps): JSX.Element => {
         'core.CreateProfile',
         'core.UserListItem',
         'core.Cropper',
+        'core.StaticContent',
         'core.UserListWithSearch',
         'core.ReactoryCreateUserMembership',
-        'mores.MoresMyPersonalDemographics',
+        'core.UserDemographics'
     ];
 
     const {
@@ -257,11 +259,12 @@ const Profile = (props: IProfileProps): JSX.Element => {
         UserListWithSearch,
         ReactoryCreateUserMembership,
         Cropper,
-        MoresMyPersonalDemographics,
+        //MoresMyPersonalDemographics,
+        UserDemographics,
         Material,
         StaticContent
     } = reactory.getComponents<ProfileDependencies>(components)
-    
+
     const [avatarMouseOver, setAvatarMouseOver] = React.useState(false);
     const [confirmRemovePeer, setConfirmRemovePeer] = React.useState<Reactory.Models.IUser>(null);
     const [showAddUserDialog, setShowAddUserDialog] = React.useState<boolean>(false);
@@ -360,7 +363,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
     } = MaterialCore;
 
     const classes = MaterialStyles.makeStyles(ProfileStyles)();
-    debugger
 
     const onAvatarMouseOver = () => {
         setAvatarMouseOver(true)
@@ -461,7 +463,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         // that.setState({ searching: true, findPeersResult: [] }, doQuery)
     }
 
-    const renderMemberships = () => {
+    const renderMemberships = (): JSX.Element => {
         const { memberships } = profile
         const { withMembership } = props;
         const Content: JSX.Element = reactory.getComponent('core.StaticContent') as JSX.Element;
@@ -471,7 +473,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         if (withMembership === false) return null;
 
         const data = [];
-        
+
         if (memberships && memberships.length) {
             memberships.forEach(m => data.push({ ...m }))
         }
@@ -502,16 +504,14 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         }
 
-        const membershipList = (
+        return (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Paper className={classes.general}>
+                <Paper className={classes.general}>  
+                    <StaticContent
+                        slug={"core-user-profile-memebership-intro"}
+                        editRoles={["DEVELOPER", "ADMIN"]}
+                        defaultValue={defaultMembershipContent} />              
                     <Table aria-label="simple table">
-                        <caption>
-                            <StaticContent
-                                slug={"core-user-profile-memebership-intro"}
-                                editRoles={["DEVELOPER", "ADMIN"]}
-                                defaultValue={defaultMembershipContent} />
-                        </caption>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Organisation</TableCell>
@@ -578,6 +578,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                             }
                         </TableBody>
                     </Table>
+
                     {selectedMembership !== null && <AlertDialog
                         title={`Update membership for ${selectedMembership && selectedMembership.organization ? selectedMembership.organization.name : `${selectedMembership.client.name} - APPLICATION MEMBERSHIP`}`}
                         open={display_role_editor === true && selectedMembership}
@@ -650,6 +651,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                             })}
                         </Grid>
                     </AlertDialog>}
+                    
 
                     {display_add_membership === true && <AlertDialog
                         open={true} title={`Add new membership for ${profile.firstName} ${profile.lastName}`}
@@ -663,9 +665,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 </Paper>
             </Grid>
         );
-
-        return membershipList;
-
     }
 
     const renderUserDemographics = (): JSX.Element | null => {
@@ -674,13 +673,13 @@ const Profile = (props: IProfileProps): JSX.Element => {
             <Grid item sm={12} xs={12} >
                 <Paper>
                     <Typography className={classes.sectionHeaderText}>Demographics</Typography>
-                    <MoresMyPersonalDemographics />
+                   
                 </Paper>
             </Grid>
         );
 
-        // return userDemographic;
-        return null;
+        return userDemographic;
+        //return null;
 
     }
 
@@ -1288,10 +1287,10 @@ const Profile = (props: IProfileProps): JSX.Element => {
     }
 
     const renderGeneral = () => {
-        
-        
+
+
         const { firstName, lastName, businessUnit, email, mobileNumber, avatar, peers, surveys, teams, __isnew, id, deleted } = profile;
-        
+
         const defaultFieldProps = {
             fullWidth: true,
             InputLabelProps: {
@@ -1370,7 +1369,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         let avatarComponent = null;
         avatarComponent = (
             <div className={classes.avatarContainer}>
-                <Tooltip title={`Click on the UPLOAD PHOTO button to change you profile picture`}>
+                <Tooltip title={`Click on the UPLOAD PHOTO button to change your profile picture`}>
                     <Avatar
                         src={avatarUpdated === false ? reactory.getAvatar(profile, null) : profile.avatar} alt={`${firstName} ${lastName} `}
                         className={reactory.utils.classNames(classes.avatar, classes.bigAvatar, avatarMouseOver === true ? classes.avatarHover : '')}
@@ -1393,36 +1392,36 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
 
         return (
-            <Grid item sm={12} xs={12}>
-                <Paper className={classes.general}>
-                    <form>
-                        <Grid container spacing={4}>
-                            <Grid item sm={12} xs={12} >
-                                {props.withAvatar === true ? avatarComponent : null}
-                            </Grid>
-                            <Grid item sm={6} xs={6}>
-                                <TextField variant='standard' {...defaultFieldProps} label='First Name' value={firstName} onChange={updateFirstname} />
-                            </Grid>
-                            <Grid item sm={6} xs={6} >
-                                <TextField variant='standard' {...defaultFieldProps} label='Last Name' value={lastName} onChange={updateLastname} onKeyPressCapture={onSurnameKeyPress} />
-                            </Grid>
-                            <Grid item sm={6} xs={6} >
-                                <TextField variant='standard' {...defaultFieldProps} label={emailValid === true ? 'Email Address' : 'Email!'} value={email} onChange={updateEmail} />
-                            </Grid>
-                            <Grid item sm={6} xs={6} >
-                                <TextField variant='standard' {...defaultFieldProps} label='Mobile Number' value={mobileNumber} onChange={updateMobileNumber} />
-                            </Grid>
+            <Grid item sm={12} xs={12} xl={12}>
+                <Paper>
+                    <Grid container spacing={4}>
+                        <Grid item sm={12} xs={12}>
+                            <Typography variant='h4'color="primary">PROFILE</Typography>
                         </Grid>
-                    </form>
-
-                    <div className={classes.saveContainer}>
-                        <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>SAVE CHANGES</Button>
-                    </div>
+                        {withAvatar === true && <Grid item sm={12} xs={12}>
+                            {avatarComponent}
+                        </Grid>}
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                            <TextField variant='standard' {...defaultFieldProps} label='First Name' value={firstName} onChange={updateFirstname}/>
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                            <TextField variant='standard' {...defaultFieldProps} label='Last Name' value={lastName} onChange={updateLastname} onKeyPressCapture={onSurnameKeyPress} />
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                            <TextField variant='standard' {...defaultFieldProps} label={emailValid === true ? 'Email Address' : 'Email!'} value={email} onChange={updateEmail} />
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                            <TextField variant='standard' {...defaultFieldProps} label='Mobile Number' value={mobileNumber} onChange={updateMobileNumber} />
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                            <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>SAVE CHANGES</Button>
+                        </Grid>
+                    </Grid>
                 </Paper>
             </Grid>)
     }
 
-    const renderHeader = () => {
+    const renderHeader = (): JSX.Element => {
 
         if (props.mode !== 'admin') return null;
 
@@ -1496,8 +1495,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
         )
     }
 
-    const renderFooter = () => {
-
+    const renderFooter = (): JSX.Element => {
+        return (<></>)
     }
 
     const renderCropper = () => {
@@ -1548,38 +1547,44 @@ const Profile = (props: IProfileProps): JSX.Element => {
     };
 
 
+    let componentList: JSX.Element[] = [];
+    // const Demographics: React.FunctionComponent<any> = reactory.getComponent('core.UserDemographics');
     let ProfileInGrid: JSX.Element = null
-    if(loading === true) {
+    if (loading === true) {
         ProfileInGrid = (<div>Loading</div>)
     } else {
+
+        {/* {
+                    //renderUserDemographics()
+                }
+                {
+                    //isNew === false ? renderMemberships() : null
+                }
+                {
+                    //isNew === false ? renderPeers() : null
+                }
+                {
+                    //isNew === false ? renderFooter() : null
+                }
+                {
+                    //isNew === false ? renderCropper() : null
+                } */}
+
+        componentList.push(renderHeader());
+        componentList.push(renderGeneral());
+        componentList.push(renderUserDemographics());
+        componentList.push(renderMemberships());
+        componentList.push(renderPeers());
+        componentList.push(renderCropper());
+        componentList.push(renderFooter());
         ProfileInGrid = (
-            <Grid container spacing={2}>
-                {
-                 // renderHeader()
-                }
-                <Typography className={classes.sectionHeaderText}>PROFILE</Typography>
-                {renderGeneral()}
-                { 
-                //renderUserDemographics()
-                }
-                {isNew === false && <Typography className={classes.sectionHeaderText}>My Assessors</Typography>}
-                {
-                //isNew === false ? renderMemberships() : null
-                }
-                {
-                //isNew === false ? renderPeers() : null
-                }
-                {
-                //isNew === false ? renderFooter() : null
-                }
-                {
-                //isNew === false ? renderCropper() : null
-                }
+            <Grid container spacing={2} style={{ padding: 10 }}>
+                {componentList}
             </Grid>
         );
     }
 
-    const Demographics: React.FunctionComponent<any> = reactory.getComponent('core.UserDemographics');
+    
 
     /**
      * <Demographics user={profile}
@@ -1592,7 +1597,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
         return (
             <div {...containerProps} className={classes.profileTopMargin}>
                 {ProfileInGrid}
-                
             </div>
         );
     } else {

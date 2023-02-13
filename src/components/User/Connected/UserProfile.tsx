@@ -103,8 +103,7 @@ const UserProfile = (props: UserProfileProps) => {
   return (
     <Query query={gql(query)} variables={{ profileId: pid }} >
       {(queryResults) => {
-        const { loading, error, data, refetch } = queryResults;
-        debugger
+        const { loading, error, data, refetch } = queryResults;        
         if (loading) return <p>Loading User Profile, please wait...</p>
         if (error) return <p>{error.message}</p>
 

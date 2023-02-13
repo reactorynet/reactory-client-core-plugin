@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { withStyles, withTheme } from '@mui/styles';
-import { withReactory } from '../../../../reactory-client/src/api/ApiProvider';
+//import { withReactory } from '../../../../reactory-client/src/api/ApiProvider';
 import uuid from 'uuid';
 
 
