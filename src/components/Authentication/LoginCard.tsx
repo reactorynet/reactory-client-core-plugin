@@ -186,7 +186,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
         break;
       }
       case 'microsoft': {
-        // authcomponents.push((<MicrosoftLogin key={authType} /> || <p>Login Button goes here</p>));
+        authcomponents.push((<MicrosoftLogin key={authType} /> || <p>Login Button goes here</p>));
         break;
       }
     }
