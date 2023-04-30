@@ -1,21 +1,5 @@
 import Reactory from '@reactory/reactory-core';
 
-const defaultProfile = {
-    __isnew: true,
-    firstName: '',
-    lastName: '',
-    email: '',
-    mobileNumber: '',
-    businessUnit: '',
-    peers: {
-        organization: null,
-        user: null,
-        peers: []
-    },
-    memberships: [],
-    avatar: null,
-};
-
 const userPeersQueryFragment = `
 user {
     id
@@ -50,6 +34,9 @@ updatedAt
 const nilf = () => { };
 
 const ProfileStyles = (theme: any) => ({
+    PaperDefault: {
+        padding: `10px`,
+    },
     mainContainer: {
         width: '100%',
         maxWidth: '1024px',
@@ -135,40 +122,13 @@ const ProfileStyles = (theme: any) => ({
     },
 });
 
-
-/**
- *  static propTypes = {
-    profile: PropTypes.object.isRequired,
-    profileTitle: PropTypes.string,        
-    loading: PropTypes.bool,
-    organizationId: PropTypes.string,
-    onPeersConfirmed: PropTypes.func,
-    surveyId: PropTypes.string,
-    mode: PropTypes.string,
-    isNew: PropTypes.bool,
-    onCancel: PropTypes.func,
-    onSave: PropTypes.func,
-    withPeers: PropTypes.bool,
-    withAvatar: PropTypes.bool,
-    withMembership: PropTypes.bool,
-    withBackButton: PropTypes.bool,
-    firstNameHelperText: PropTypes.string,
-    surnameHelperText: PropTypes.string,
-    emailHelperText: PropTypes.string,
-    headerComponents: PropTypes.func,
-    footerComponents: PropTypes.func,
-    refetch: PropTypes.func
-    };
- */
-
-
 export interface IProfileProps extends Reactory.IReactoryComponentProps {
     profile: Reactory.Models.IUser,
     profileTitle: string,
     loading: boolean,
     organizationId: string,
     onPeersConfirmed: () => void
-    mode: string,
+    mode: string | "admin" | "user" | "self",
     isNew: boolean,
     onCancel: () => void,
     onSave: (profile: Reactory.Models.IUser) => void,
@@ -188,32 +148,14 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
     const { reactory, loading, withAvatar = true } = props;
 
-    const defaultProps = {
-        profile: defaultProfile,
-        loading: false,
-        profileTitle: 'My Profile',
-        mode: 'user',
-        highlight: 'none',
-        isNew: false,
-        onCancel: nilf,
-        onSave: nilf,
-        withPeers: true,
-        withAvatar: true,
-        withMembership: true,
-        withBackButton: true,
-        firstNameHelperText: null,
-        surnameHelperText: null,
-        emailHelperText: null,
-        headerComponents: (props) => {
-
-        },
-        footerComponents: (props) => {
-
-        },
-    };
+    let isProfileOwner = false;
+    if (props.profile && props.profile.id) {
+        isProfileOwner = props.profile.id === reactory.getUser().id;
+    }
 
     interface ProfileDependencies {
         React: Reactory.React,
+        ReactRouterDom: Reactory.Routing.ReactRouterDom,
         Material: Reactory.Client.Web.IMaterialModule,
         AlertDialog: React.FunctionComponent<any>,
         BasicModal: React.FunctionComponent<any>,
@@ -232,6 +174,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
     const components = [
         'react.React',
+        'react-router.ReactRouterDom',
         'material-ui.Material',
         'material-ui.MaterialTable',
         'core.AlertDialog',
@@ -249,6 +192,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
     const {
         React,
+        ReactRouterDom,
         AlertDialog,
         BasicModal,
         Loading,
@@ -259,7 +203,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
         UserListWithSearch,
         ReactoryCreateUserMembership,
         Cropper,
-        //MoresMyPersonalDemographics,
         UserDemographics,
         Material,
         StaticContent
@@ -291,31 +234,12 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const [showConfirmDeleteUser, setShowConfirmDeleteUser] = React.useState<boolean>(false);
     const [userDeleted, setUserDeleted] = React.useState<boolean>(false);
     const [userDeletedMessage, setUserDeletedMessage] = React.useState(null);
-    //const [userProfileImageFile, setUserProfileImageFile] = React.useState<any>(null)
 
     const userProfileImageFile = React.useRef<HTMLInputElement>(null);
 
-    // this.state = {
-    //     avatarMouseOver: false,
-    //     profile: { ...props.profile },
-    //     avatarUpdated: false,
-    //     imageCropped: false,
-    //     imageMustCrop: false,
-    //     showPeerSelection: false,
-    //     selectedMembership: null,
-    //     selected_peer_list: [],
-    //     page: 1,
-    //     emailValid: props.profile.email && isEmail(props.profile.email) === true,
-    //     help: props.reactory.queryObject.help === "true",
-    //     helpTopic: props.reactory.queryObject.helptopics,
-    //     highlight: props.reactory.queryObject.peerconfig === "true" ? "peers" : null,
-    //     activeOrganisationId: props.organizationId,
-    //     activeOrganisationIndex: 0,
-    //     display_role_editor: false,
-    // };
-
-
-
+    const { useNavigate } = ReactRouterDom;
+    const navigate = useNavigate();
+    const { t } = reactory.i18n;
 
     React.useEffect(() => {
         setProfile(props.profile);
@@ -362,7 +286,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         Typography
     } = MaterialCore;
 
-    const classes = MaterialStyles.makeStyles(ProfileStyles)();
+    const classes = MaterialStyles.makeStyles(ProfileStyles)(props);
 
     const onAvatarMouseOver = () => {
         setAvatarMouseOver(true)
@@ -425,6 +349,12 @@ const Profile = (props: IProfileProps): JSX.Element => {
         });
     }
 
+    const GoBack = (): JSX.Element => (
+        <IconButton onClick={(e) => {
+            navigate(-1);
+        }}><Icon>arrow_back</Icon></IconButton>
+    );
+
     const onMembershipSelectionChanged = (membership, index) => {
         // this.setState({
         //     selectedMembership: membership,
@@ -466,10 +396,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const renderMemberships = (): JSX.Element => {
         const { memberships } = profile
         const { withMembership } = props;
-        const Content: JSX.Element = reactory.getComponent('core.StaticContent') as JSX.Element;
-
-
-
+        
         if (withMembership === false) return null;
 
         const data = [];
@@ -480,105 +407,102 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         const defaultMembershipContent = (
             <>
-                <Typography variant="h6">Organisation Membership(s)</Typography>
-                <Typography variant="body2">
+                <Typography variant="body1">
                     If you are registered to participate in other organizations, all your memberships will appear here. <br />
                     Selecting a membership will load your organisation structure, for that organisation or particular business unit. <br />
                 </Typography>
-                <Typography>
+                <Typography variant="body2">
                     * Most users will only have one membership. These memberships are managed by the administrators for your organisation.
                 </Typography>
             </>
         )
 
-
-
         const can_edit_roles = reactory.hasRole(['ADMIN']) === true;
 
         const onAddNewMembership = () => {
-            //that.setState({ display_add_membership: true });
+            setDisplayAddMembership(true);
         };
 
-        const onCloseAddMembership = () => {
-            //that.setState({ display_add_membership: false });
-
+        const onCloseAddMembership = () => {            
+            setDisplayAddMembership(false);
         }
 
         return (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Paper className={classes.general}>  
+                <Typography variant="h6" color="primary">Memberships</Typography>
+                <Paper className={classes.PaperDefault}>
                     <StaticContent
                         slug={"core-user-profile-memebership-intro"}
                         editRoles={["DEVELOPER", "ADMIN"]}
-                        defaultValue={defaultMembershipContent} />              
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Organisation</TableCell>
-                                <TableCell>{can_edit_roles === true && <Button color="primary" onClick={onAddNewMembership}>ADD MEMBERSHIP</Button>}</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.map((membership: Reactory.Models.IMembership, index) => {
-                                let id = ''
-                                if (membership && membership.organization) {
-                                    id = membership.organization.id
-                                }
-
-                                let membershipText = `${membership.client.name} - APPLICATION MEMBERSHIP`;
-
-                                if (membership.organization && membership.organization.name) {
-                                    membershipText = `${membership.organization.name}`
-                                }
-
-                                if (membership.businessUnit && membership.businessUnit.name) {
-                                    membershipText = `${membershipText} [${membership.businessUnit.name}]`;
-                                }
-
-                                return (
-                                    <TableRow
-                                        key={index}
-                                        className={activeOrganizationId === id ? classes.activeOrganisation : ""}>
-                                        <TableCell>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <Avatar style={{ marginRight: `8px` }}>
-                                                        {membership &&
-                                                            membership.organization &&
-                                                            membership.organization.name
-                                                            ? membership.organization.name.substring(0, 2)
-                                                            : membership.client.name.substring(0, 2)}
-                                                    </Avatar>
-                                                </ListItemAvatar>
-                                                <ListItemText
-                                                    primary={`${membershipText}`}
-                                                    secondary={`Roles: ${membership.roles.map((r: string) => `${r}`)}`.trim()}
-                                                />
-                                            </ListItem>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {can_edit_roles === true && selectedMembership && selectedMembership.id === membership.id && <IconButton onClick={() => {
-                                                // that.setState({ display_role_editor: true }, () => {
-                                                //     if (membership.id !== that.state.selectedMembership.id) {
-                                                //         that.onMembershipSelectionChanged(membership, index);
-                                                //     }
-                                                // })
-                                            }}><Icon>edit</Icon></IconButton>}
-                                            <IconButton
-                                                onClick={() => {
-                                                    onMembershipSelectionChanged(membership, index);
-                                                    activeOrganisation(membership)
-                                                }}>
-                                                <Icon>chevron_right</Icon>
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })
+                        defaultValue={defaultMembershipContent} />
+                    <MaterialCore.List>
+                        {can_edit_roles && 
+                        <ListItem key={'add_membership'}>
+                            <Button
+                                variant="contained" 
+                                color="primary"
+                                endIcon={<Icon>add</Icon>} 
+                                onClick={onAddNewMembership}>
+                                    {t("reactory.profile.add_membership", "ADD MEMBERSHIP").toUpperCase()}
+                            </Button>
+                        </ListItem>
+                        }
+                        {data.map((membership: Reactory.Models.IMembership, index) => {
+                            let id = ''
+                            if (membership && membership.organization) {
+                                id = membership.organization.id
                             }
-                        </TableBody>
-                    </Table>
 
+                            let membershipText = `${t(membership.client.name)} - APPLICATION MEMBERSHIP`;
+
+                            if (membership.organization && membership.organization.name) {
+                                membershipText = `${membership.organization.name}`
+                            }
+
+                            if (membership.businessUnit && membership.businessUnit.name) {
+                                membershipText = `${membershipText} [${membership.businessUnit.name}]`;
+                            }
+
+                            let allow_edit = can_edit_roles && membership.id === selectedMembership?.id;
+
+                            return (
+                                <ListItem key={index}
+                                    className={activeOrganizationId === id ? classes.activeOrganisation : ""}>
+                                    <ListItemAvatar>
+                                        <Avatar style={{ marginRight: `8px` }}>
+                                            {membership &&
+                                                membership.organization &&
+                                                membership.organization.name
+                                                ? membership.organization.name.substring(0, 2)
+                                                : membership.client.name.substring(0, 2)}
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={`${membershipText}`}
+                                        secondary={`Roles: ${membership.roles.map((r: string) => `${r}`)}`.trim()}
+                                    />
+                                    {allow_edit &&
+                                    <IconButton onClick={() => {
+                                        setSelectedMembership(membership);
+                                        setDisplayRoleEditor(true);
+                                        // that.setState({ display_role_editor: true }, () => {
+                                        //     if (membership.id !== that.state.selectedMembership.id) {
+                                        //         that.onMembershipSelectionChanged(membership, index);
+                                        //     }
+                                        // })
+                                    }}><Icon>edit</Icon></IconButton>}
+                                    <IconButton
+                                        onClick={() => {
+                                            onMembershipSelectionChanged(membership, index);
+                                            activeOrganisation(membership)
+                                        }}>
+                                        <Icon>chevron_right</Icon>
+                                    </IconButton>
+                                </ListItem>
+                            )
+                        })
+                    }
+                    </MaterialCore.List>
                     {selectedMembership !== null && <AlertDialog
                         title={`Update membership for ${selectedMembership && selectedMembership.organization ? selectedMembership.organization.name : `${selectedMembership.client.name} - APPLICATION MEMBERSHIP`}`}
                         open={display_role_editor === true && selectedMembership}
@@ -651,40 +575,46 @@ const Profile = (props: IProfileProps): JSX.Element => {
                             })}
                         </Grid>
                     </AlertDialog>}
-                    
-
-                    {display_add_membership === true && <AlertDialog
-                        open={true} title={`Add new membership for ${profile.firstName} ${profile.lastName}`}
-                        showCancel={false}
-                        onAccept={() => {
-                            //that.setState({ display_add_membership: false }) 
-                        }}
-                        acceptTitle={'DONE'}>
-                        <ReactoryCreateUserMembership user={profile} />
-                    </AlertDialog>}
+                    {
+                        display_add_membership === true &&
+                        <AlertDialog
+                            open={true}
+                            title={`Add new membership for ${profile.firstName} ${profile.lastName}`}
+                            showCancel={false}
+                            onAccept={() => {
+                                setDisplayAddMembership(false);
+                            }}
+                            acceptTitle={'DONE'}>
+                            <ReactoryCreateUserMembership user={profile} />
+                        </AlertDialog>
+                    }
                 </Paper>
             </Grid>
         );
     }
 
     const renderUserDemographics = (): JSX.Element | null => {
-
+        const displayDemographics = props.profie && selectedMembership && activeOrganizationId
         const userDemographic = (
             <Grid item sm={12} xs={12} >
-                <Paper>
-                    <Typography className={classes.sectionHeaderText}>Demographics</Typography>
-                   
+                <Typography className={classes.sectionHeaderText} variant="h6" color="primary">Demographics</Typography>
+                <Paper className={classes.PaperDefault}>
+                    {displayDemographics ? <UserDemographics 
+                        user={props.profile}
+                        membership={selectedMembership}
+                        organisationId={activeOrganizationId}
+                    /> : 
+                    <Typography variant="body1">Please select an organisation to view the user demographics.</Typography>
+                    }
                 </Paper>
             </Grid>
         );
 
         return userDemographic;
-        //return null;
-
     }
 
-    const renderPeers = () => {
-        const { history, reactory, withPeers } = props;
+    const renderPeers = (): JSX.Element => {
+        const { reactory, withPeers } = props;
         if (withPeers === false) return null
 
 
@@ -1146,16 +1076,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
             const { organization } = selectedMembership;
 
-            /**
-             * 
-             * 
-             * 
-             */
-
-
-            const Content = reactory.getComponent('core.StaticContent');
-            const { ReactoryForm } = reactory.getComponents(['core.ReactoryForm'])
-
             const InModal = ({ onDone = () => { } }) => {
 
                 const [selected_peer_list, setSeletedPeerList] = React.useState<any[]>([]);
@@ -1270,11 +1190,14 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         const peersComponent = (
             <Grid item sm={12} xs={12}>
+                <Typography variant='h6' color='primary'>Organigram</Typography>
                 {confirmPeersDialog}
                 {addUserDialog}
                 {
                     !membershipSelected &&
-                    <Paper className={classes.general}><Typography variant="body2">Select a membership with an organization organization to load assessors</Typography></Paper>
+                    <Paper className={classes.PaperDefault}>
+                        <Typography variant="body2">Select a membership with an organization organization to load assessors</Typography>
+                    </Paper>
                 }
                 {
                     membershipSelected &&
@@ -1286,7 +1209,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         return peersComponent;
     }
 
-    const renderGeneral = () => {
+    const renderGeneral = (): JSX.Element => {
 
 
         const { firstName, lastName, businessUnit, email, mobileNumber, avatar, peers, surveys, teams, __isnew, id, deleted } = profile;
@@ -1306,12 +1229,12 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         const doSave = () => {
             let $profile = { ...profile }
-            //cleanup for save
-            if ($profile.peers) delete profile.peers
-            if ($profile.surveys) delete profile.surveys
-            if ($profile.teams) delete profile.teams
-            if ($profile.notifications) delete profile.notifications
-            if ($profile.memberships) delete profile.memberships
+            //cleanup for save        
+            if ($profile.peers) delete $profile.peers
+            if ($profile.surveys) delete $profile.surveys
+            if ($profile.teams) delete $profile.teams
+            if ($profile.notifications) delete $profile.notifications
+            if ($profile.memberships) delete $profile.memberships
             $profile.authProvider = 'LOCAL'
             $profile.providerId = 'reactory-system'
 
@@ -1390,32 +1313,53 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 </label>
             </div>);
 
+        let allowsEdits = props.mode === 'admin' || props.mode === 'self';
+
 
         return (
             <Grid item sm={12} xs={12} xl={12}>
-                <Paper>
+                <Grid item sm={12} xs={12} alignItems={'flex-start'} display={'flex'} flexDirection={'row'}>
+                    <GoBack /><Typography variant='h6' color="primary">{firstName} {lastName}</Typography>
+                </Grid>
+                <Paper className={classes.PaperDefault}>
                     <Grid container spacing={4}>
-                        <Grid item sm={12} xs={12}>
-                            <Typography variant='h4'color="primary">PROFILE</Typography>
-                        </Grid>
                         {withAvatar === true && <Grid item sm={12} xs={12}>
                             {avatarComponent}
                         </Grid>}
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                            <TextField variant='standard' {...defaultFieldProps} label='First Name' value={firstName} onChange={updateFirstname}/>
+                            <TextField
+                                variant='standard'
+                                {...defaultFieldProps}
+                                label='First Name'
+                                value={firstName}
+                                onChange={updateFirstname} />
                         </Grid>
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                            <TextField variant='standard' {...defaultFieldProps} label='Last Name' value={lastName} onChange={updateLastname} onKeyPressCapture={onSurnameKeyPress} />
+                            <TextField
+                                variant='standard'
+                                {...defaultFieldProps}
+                                label='Last Name'
+                                value={lastName}
+                                onChange={updateLastname}
+                                onKeyPressCapture={onSurnameKeyPress} />
                         </Grid>
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
-                            <TextField variant='standard' {...defaultFieldProps} label={emailValid === true ? 'Email Address' : 'Email!'} value={email} onChange={updateEmail} />
+                            <TextField
+                                variant='standard'
+                                {...defaultFieldProps}
+                                label={emailValid === true ? 'Email Address' : 'Email!'}
+                                value={email} onChange={updateEmail} />
                         </Grid>
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
-                            <TextField variant='standard' {...defaultFieldProps} label='Mobile Number' value={mobileNumber} onChange={updateMobileNumber} />
+                            <TextField
+                                variant='standard'
+                                {...defaultFieldProps}
+                                label='Mobile Number'
+                                value={mobileNumber} onChange={updateMobileNumber} />
                         </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                        {isProfileOwner === true && <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
                             <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>SAVE CHANGES</Button>
-                        </Grid>
+                        </Grid>}
                     </Grid>
                 </Paper>
             </Grid>)
@@ -1424,6 +1368,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const renderHeader = (): JSX.Element => {
 
         if (props.mode !== 'admin') return null;
+        if (reactory.hasRole(['ADMIN']) === false) return null;
 
         const onDeleteClick = e => {
             // that.setState({ showConfirmDeleteUser: true })
@@ -1483,6 +1428,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         return (
             <>
                 <Toolbar>
+                    <GoBack />
                     <Typography variant="caption">Admin: {profile.firstName} {profile.lastName} {profile.deleted === true ? "[ User Deleted ]" : ""}</Typography>
                     {profile.deleted === true ? null : <Tooltip title="Click here to delete the user">
                         <IconButton onClick={onDeleteClick}>
@@ -1548,27 +1494,10 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
 
     let componentList: JSX.Element[] = [];
-    // const Demographics: React.FunctionComponent<any> = reactory.getComponent('core.UserDemographics');
     let ProfileInGrid: JSX.Element = null
     if (loading === true) {
         ProfileInGrid = (<div>Loading</div>)
     } else {
-
-        {/* {
-                    //renderUserDemographics()
-                }
-                {
-                    //isNew === false ? renderMemberships() : null
-                }
-                {
-                    //isNew === false ? renderPeers() : null
-                }
-                {
-                    //isNew === false ? renderFooter() : null
-                }
-                {
-                    //isNew === false ? renderCropper() : null
-                } */}
 
         componentList.push(renderHeader());
         componentList.push(renderGeneral());
@@ -1584,7 +1513,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         );
     }
 
-    
+
 
     /**
      * <Demographics user={profile}

@@ -45,10 +45,47 @@ const ReactoryUserProfileGeneral = (props: ReactoryClientCore.Components.Reactor
           },
         },
       },
+      fields: {
+        ReactoryImageField: ({children}) => { return <>{children}</> },
+      },
+      uiSchema: {
+        'ui:form': {
+          title: i18n.t('reactory.profile.general.title', "General"),
+          submitProps: {
+            variant: 'contained',
+            color: 'primary',
+          }
+        },
+        'ui:field': 'GridLayout',
+        'ui:grid-layout': [
+          {
+            avatar: { md: 12, sm: 12, xs: 12 },
+            firstName: { md: 6, sm: 12, xs: 12 },
+            lastName: { md: 6, sm: 12, xs: 12 },
+            email: { md: 12, sm: 12, xs: 12 },
+          }
+        ],
+        avatar: {
+          'ui:widget': 'ReactoryImageWidget',
+          'ui:field': 'ReactoryImageField',
+          'ui:title': '',
+          'ui:options': {
+            variant: 'avatar',
+            uploader: 'core.ReactoryProfileUploader@1.0.0',
+            className: 'AvatarRoot',
+            jss: {
+              AvatarRoot: {
+                width: '100%',
+                height: '100%',
+              }
+            }
+          }
+        }
+      }
     };
     
     return (
-      <ReactoryForm formDef={formDef} />
+      <ReactoryForm formDef={formDef} data={profile} />
     );
 }
 

@@ -31,13 +31,54 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
   `);
 
   const apiStatus = `
-  query status {
-      apiStatus {
+  query status($theme: String, $mode: String) {
+      apiStatus(theme: $theme, mode: $mode) {
       applicationName
       applicationAvatar
       applicationRoles
       when
       status
+      loggedIn {
+        user {
+          id
+          firstName
+          lastName
+        }
+        organization {
+          id
+          name
+          logo
+        }
+        team {
+          id
+          name
+        }
+        businessUnit {
+          id
+          name
+          avatar
+        }
+        roles
+        altRoles
+        memberships {
+          id
+          client {
+            id
+            name
+          }
+          organization {
+            id
+            name
+            logo
+          }
+          businessUnit {
+            id
+            name
+            avatar
+          }
+          roles
+        }
+      }
       firstName
       lastName
       email
@@ -73,7 +114,7 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
       }
       id
       theme
-      activeTheme {
+      activeTheme(mode: $mode) {
         id
         type
         name
@@ -95,7 +136,7 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
           loader
           options
           data
-        }        
+        }
       }
       themes {
         id
@@ -103,7 +144,7 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
         name
         nameSpace
         version
-        description        
+        description
       }
       server {
         id
@@ -125,11 +166,12 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
         componentFqn
         exact
         redirect
+        componentProps
         args {
           key
           value
         }
-        component {
+        components {
           nameSpace
           name
           version
@@ -200,7 +242,8 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
 			}
     }
   }
-  `
+
+`;
 
   return (
     <Mutation mutation={mutation} >

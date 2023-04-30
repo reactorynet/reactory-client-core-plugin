@@ -1,22 +1,28 @@
-import { useReactory } from "@reactory/client-core/api";
 import Reactory from '@reactory/reactory-core';
 
 export interface ReactoryMembershipRolesProps {
-  membership: Reactory.IMembership,
-  user: Reactory.IUser,
-  onChange: (membership: Reactory.IMembership) => void,
-  auto_update: boolean
+  membership: Reactory.Models.IMembership,
+  user: Reactory.Client.Models.IUser,
+  onChange: (membership: Reactory.Models.IMembership) => void,
+  auto_update: boolean,
+  reactory: Reactory.Client.IReactoryApi
 }
 
 const ReactoryMembershipRoles = (props: ReactoryMembershipRolesProps) => {
-
-  const reactory = useReactory();
-  const { user, membership, auto_update, onChange } = props;
+  const { 
+    reactory,
+    user, 
+    membership, 
+    auto_update, 
+    onChange
+  } = props;
   const { id = null } = membership;
-
   const is_new = id === null;
 
-  const { React, MaterialCore } = reactory.getComponents(['react.React', 'material-ui.MaterialCore']);
+  const { React, MaterialCore } = reactory.getComponents<{
+    React: Reactory.React,
+    MaterialCore: Reactory.Client.Web.MaterialCore
+  }>(['react.React', 'material-ui.MaterialCore']);
   const {
     Grid,
     FormControlLabel,
@@ -63,7 +69,7 @@ const ReactoryMembershipRoles = (props: ReactoryMembershipRolesProps) => {
                     };
 
 
-                    reactory.graphqlMutation(mutation, variables).then(({ data, errors = [] }) => {
+                    reactory.graphqlMutation<any, any>(mutation, variables).then(({ data, errors = [] }) => {
                       if (errors.length > 0) {
                         reactory.createNotification('Could not update the user roles.', { type: 'error', showInAppNotification: true });
                       }
