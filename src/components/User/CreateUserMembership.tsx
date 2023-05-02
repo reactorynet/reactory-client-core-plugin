@@ -4,6 +4,7 @@ import Reactory from "@reactory/reactory-core";
 type CreateUserMembershipProps = {
   reactory: Reactory.Client.IReactoryApi;
   user: Reactory.Client.Models.IUser;
+  onMembershipCreated?: (membership: Partial<Reactory.Models.IMembership>) => void;
 }
 
 interface Organisation {
@@ -13,14 +14,14 @@ interface Organisation {
 }
 
 export const CreateUserMembership = (props: CreateUserMembershipProps) => {
-  const { reactory } = props;
+  const { reactory, onMembershipCreated } = props;
   const {
     React, 
     ReactoryForm,
     Material, 
     ReactoryMembershipRoles } = reactory.getComponents<{
       React: typeof ReactAlias,
-      ReactoryForm: ReactAlias.FC<Reactory.Forms.IReactoryForm>,
+      ReactoryForm: ReactAlias.FC<Partial<Reactory.Forms.IReactoryForm>>,
       Material: Reactory.Client.Web.IMaterialModule,
       ReactoryMembershipRoles: ReactAlias.FC<unknown>
     }>([
@@ -75,7 +76,7 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
             organization: null, 
             businessUnit: null, 
             roles: formData }} onChange={(membership) => {
-          onChange(membership.roles)
+            onChange(membership.roles)
         }} />
       </>
     )
@@ -139,7 +140,7 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
       }
     }`;
 
-    reactory.graphqlMutation(mutation, { user_id: props.user.id, organization, businessUnit, roles }).then(({ data, errors = [] }) => {
+    reactory.graphqlMutation<any, any>(mutation, { user_id: props.user.id, organization, businessUnit, roles }).then(({ data, errors = [] }) => {
 
       if (errors.length > 0) {
         reactory.log(`Could not create the new the role`, { errors }, 'errors');
@@ -158,6 +159,7 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
             }
           }
           reactory.createNotification(`New membership created for ${props.user.firstName} ${props.user.lastName}${message}`, { type: 'success', showInAppNotification: true });
+          if(onMembershipCreated) onMembershipCreated({ id, organization, businessUnit, roles })
         }
       }
 

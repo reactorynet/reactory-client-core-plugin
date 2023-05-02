@@ -146,7 +146,7 @@ export interface IProfileProps extends Reactory.IReactoryComponentProps {
 
 const Profile = (props: IProfileProps): JSX.Element => {
 
-    const { reactory, loading, withAvatar = true } = props;
+    const { reactory, loading, withAvatar = true, refetch } = props;
 
     let isProfileOwner = false;
     if (props.profile && props.profile.id) {
@@ -232,6 +232,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const [searching, setIsSearching] = React.useState<boolean>(false);
     const [showResult, setShowResult] = React.useState<boolean>(false);
     const [showConfirmDeleteUser, setShowConfirmDeleteUser] = React.useState<boolean>(false);
+    const [showConfirmRemoveMembership, setShowConfirmRemoveMembership] = React.useState<boolean>(false);
     const [userDeleted, setUserDeleted] = React.useState<boolean>(false);
     const [userDeletedMessage, setUserDeletedMessage] = React.useState(null);
 
@@ -299,7 +300,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const activeOrganisation = (membership) => {
         let id = ''
         if (membership && membership.organization) id = membership.organization.id
-
+        
         setActiveOrganizationId(id);
     }
 
@@ -356,13 +357,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     );
 
     const onMembershipSelectionChanged = (membership, index) => {
-        // this.setState({
-        //     selectedMembership: membership,
-        //     activeOrganisationIndex: index,
-        //     loadingPeers: true
-        // }, () => {
-        //     refreshPeers()
-        // });
+        setSelectedMembership(membership);
     }
 
     const renderUser = () => {
@@ -427,6 +422,35 @@ const Profile = (props: IProfileProps): JSX.Element => {
             setDisplayAddMembership(false);
         }
 
+        const deleteMembership = async (membership) => { 
+            const deleteResult = await reactory.graphqlMutation <{RemoveUserMembership: Reactory.Models.CoreSimpleResponse}, any>(`
+                mutation RemoveUserMembership($user_id: String!, $id: String!) {
+                    ReactoryCoreRemoveUserMembership(user_id: $user_id, id: $id) {
+                        success
+                        message
+                    }
+                }
+            `, { id: membership.id, user_id: profile.id });
+            debugger;
+            const { 
+                data,
+                errors,
+            } = deleteResult;
+
+            if(data === null && errors.length > 0) {
+                reactory.createNotification('Error deleting user membership', {
+                    type: 'warning'
+                })
+            } else {
+                reactory.createNotification(data.RemoveUserMembership.message, {
+                    type: data.success === true ? 'success' : 'warning'
+                });
+
+                if(refetch) refetch();
+                if(isProfileOwner) await reactory.status()
+            }
+        }
+
         return (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography variant="h6" color="primary">Memberships</Typography>
@@ -481,16 +505,16 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                         primary={`${membershipText}`}
                                         secondary={`Roles: ${membership.roles.map((r: string) => `${r}`)}`.trim()}
                                     />
-                                    {allow_edit &&
+                                    {can_edit_roles === true &&
                                     <IconButton onClick={() => {
                                         setSelectedMembership(membership);
-                                        setDisplayRoleEditor(true);
-                                        // that.setState({ display_role_editor: true }, () => {
-                                        //     if (membership.id !== that.state.selectedMembership.id) {
-                                        //         that.onMembershipSelectionChanged(membership, index);
-                                        //     }
-                                        // })
+                                        setDisplayRoleEditor(true);                                        
                                     }}><Icon>edit</Icon></IconButton>}
+                                    {can_edit_roles === true &&
+                                    <IconButton onClick={() => {
+                                        setSelectedMembership(membership);
+                                        setShowConfirmRemoveMembership(true);
+                                    }}><Icon>delete</Icon></IconButton>}
                                     <IconButton
                                         onClick={() => {
                                             onMembershipSelectionChanged(membership, index);
@@ -504,7 +528,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                     }
                     </MaterialCore.List>
                     {selectedMembership !== null && <AlertDialog
-                        title={`Update membership for ${selectedMembership && selectedMembership.organization ? selectedMembership.organization.name : `${selectedMembership.client.name} - APPLICATION MEMBERSHIP`}`}
+                        title={`Update membership for ${selectedMembership && selectedMembership.organization ? selectedMembership.organization.name : `${t(selectedMembership.client.name)} - APPLICATION MEMBERSHIP`}`}
                         open={display_role_editor === true && selectedMembership}
                         showCancel={false}
                         acceptTitle={'DONE'}
@@ -514,8 +538,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
                         }}
                     >
                         <Grid container>
-                            {selectedMembership && reactory.$user.applicationRoles.map((applicationRole: string) => {
 
+                            {selectedMembership && reactory.$user.applicationRoles.map((applicationRole: string) => {
                                 if (applicationRole !== 'ANON') {
                                     return (<Grid item xs={12} sm={12} md={12} lg={12}>
                                         <FormControlLabel
@@ -544,7 +568,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                                 const variables = {
                                                     user_id: profile.id,
                                                     id: selectedMembership.id,
-                                                    roles: selectedMembership.roles
+                                                    roles: roles
                                                 };
 
                                                 interface TResult { ReactoryCoreSetRolesForMembership: { success: boolean, message: string, payload: any } }
@@ -555,7 +579,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
                                                     if (data && data.ReactoryCoreSetRolesForMembership) {
                                                         const { success, message, payload } = data.ReactoryCoreSetRolesForMembership;
-                                                        reactory.createNotification('Could not update the user roles.', { type: 'error', showInAppNotification: true });
+                                                        reactory.createNotification(message, { type: success ? 'success' : 'error', showInAppNotification: true });
                                                     }
 
 
@@ -585,7 +609,36 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 setDisplayAddMembership(false);
                             }}
                             acceptTitle={'DONE'}>
-                            <ReactoryCreateUserMembership user={profile} />
+                            <ReactoryCreateUserMembership 
+                                user={profile}
+                                onMembershipCreated={async (membership) => {
+                                    if(membership && membership.id && refetch) {
+                                        refetch();
+                                        if(isProfileOwner === true) {
+                                            await reactory.status();
+                                        }
+                                    }
+                                }}
+                                 />
+                        </AlertDialog>
+                    }
+                    {
+                        showConfirmRemoveMembership === true &&
+                        <AlertDialog
+                            open={true}
+                            title={`Confirm, delete membership for ${profile.firstName} ${profile.lastName}`}
+                            showCancel={true}
+                            onAccept={() => {
+                                setShowConfirmRemoveMembership(false);
+                                deleteMembership(selectedMembership);
+                            }}
+                            onClose={() => {
+                                setShowConfirmRemoveMembership(false);
+                            }}
+                            acceptTitle={t('common.cta.delete','DELETE')}
+                            cancelTitle={t('common.cta.cancel', 'CANCEL')}
+                            >
+                            <Typography variant="body1">Are you sure you want to delete the membership for {profile.firstName} {profile.lastName}?</Typography>
                         </AlertDialog>
                     }
                 </Paper>
@@ -1358,7 +1411,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 value={mobileNumber} onChange={updateMobileNumber} />
                         </Grid>
                         {isProfileOwner === true && <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
-                            <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>SAVE CHANGES</Button>
+                            <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>{t('common.cta.update', 'UPDATE').toUpperCase()}</Button>
                         </Grid>}
                     </Grid>
                 </Paper>
