@@ -31,7 +31,38 @@ declare namespace ReactoryClientCore {
       components?: ProfileComponentItem[],
     }
 
-    export type ProfileHook = (props: ProfileHookProps) => ProfileHookReturn 
+    export type ProfileHook = (props: ProfileHookProps) => ProfileHookReturn
+    
+    
+    export interface OrganizationListHookProps {
+      reactory: Reactory.Client.IReactoryApi;
+    }
+
+    export type OrganizationListHookReturn = {
+      organizations: Models.OrganizationList
+      loading: boolean
+      error?: string
+    }
+
+    export type OrganizationListHook = (props: OrganizationListHookProps) => OrganizationListHookReturn
+
+    export interface OrganizationHookProps {
+      reactory: Reactory.Client.IReactoryApi;
+      organizationId: string
+    }
+
+    export type OrganizationHookReturn = {
+      organization: Models.Organization
+      loading: boolean
+      error?: string
+      dirty: boolean
+      deleted: boolean
+      update: (organization: ReactoryClientCore.Models.Organization) => void
+      delete: (organization: ReactoryClientCore.Models.Organization) => Promise<void>
+      save: () => Promise<void>
+    }
+
+    export type OrganizationHook = (props: OrganizationHookProps) => OrganizationHookReturn;
   }
   export namespace Components {
     export interface EditProfileProps extends Reactory.IReactoryComponentProps {
@@ -82,5 +113,29 @@ declare namespace ReactoryClientCore {
       isNew: boolean
       loading: boolean
     }
+  }
+
+  export namespace Models {
+    export interface IOranization {
+      id: string;
+      name: string;
+      code?: string
+      avatarURL?: string
+      avatar?: string;
+      logoURL?: string;
+      logo?: string;
+    }
+
+    export interface OrganizationState {
+      isLoading: boolean
+      isNew: boolean
+      isDirty: boolean
+      isCached: boolean
+      hasError: boolean
+      canEdit: boolean
+      canDelete: boolean
+    }
+
+    export type OrganizationList = IOranization[];
   }
 }

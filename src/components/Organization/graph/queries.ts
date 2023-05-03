@@ -9,7 +9,7 @@ const base_query = `
     settings
 `;
 
-const LoggedInOrganisationQuery = `
+export const LoggedInOrganisationQuery = `
 query CoreActiveOrganisation {
   CoreActiveOrganisation {
     ${base_query}
@@ -17,7 +17,7 @@ query CoreActiveOrganisation {
 }
 `;
 
-const CoreOrganizations = `
+export const CoreOrganizations = `
 query CoreOrganizations  {
   CoreOrganizations {
     ${base_query}
@@ -25,7 +25,15 @@ query CoreOrganizations  {
 }  
 `;
 
-const SetActiveOrganisationMutation = `
+export const CoreOrganisationWithId = `
+query CoreOrganisationWithId($id: String!) {
+  CoreOrganisationWithId(id: $id) {
+    ${base_query}
+  }
+}
+`;
+
+export const SetActiveOrganisationMutation = `
 mutation CoreSetActiveOrganisation($id: String!) {
   CoreSetActiveOrganisation(id: $id) {
     ${base_query}
@@ -33,7 +41,7 @@ mutation CoreSetActiveOrganisation($id: String!) {
 }
 `;
 
-const CoreSetOrganisationInfo = `
+export const CoreSetOrganisationInfo = `
   mutation CoreSetOrganisationInfo($organisation: CoreOrganisationInput!) {
     CoreSetOrganisationInfo(organisation: $organisation){
       success
@@ -50,5 +58,6 @@ export default {
   LoggedInOrganisationQuery,
   CoreOrganizations,
   SetActiveOrganisationMutation,
-  CoreSetOrganisationInfo: CoreSetOrganisationInfo
+  CoreSetOrganisationInfo: CoreSetOrganisationInfo,
+  CoreOrganisationWithId
 };

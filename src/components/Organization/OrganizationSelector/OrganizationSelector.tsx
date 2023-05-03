@@ -1,10 +1,6 @@
-import Queries from './queries';
-import Models, { CoreOrganisationModel } from './models';
-const {
-  LoggedInOrganisationQuery,
-  CoreOrganizations,
-  SetActiveOrganisationMutation,
-} = Queries;
+import Queries from '../graph/queries';
+import Models, { CoreOrganisationModel, CoreOrganizationList } from '../models/models';
+import { useOrganizationList, useOrganization } from '../hooks';
 
 export type OrganizationSelectorProps = {
   reactory: Reactory.Client.IReactoryApi,
@@ -32,7 +28,13 @@ export default (props: OrganizationSelectorProps) => {
 
 
   const { React, ReactRouterDom, MaterialCore, MaterialStyles, AlertDialog } =
-    reactory.getComponents([
+    reactory.getComponents<{ 
+      React: Reactory.React, 
+      ReactRouterDom: Reactory.Routing.ReactRouterDom,
+      MaterialCore: Reactory.Client.Web.MaterialCore,
+      MaterialStyles: Reactory.Client.Web.MaterialStyles,
+      AlertDialog: React.FC<any>
+     }>([
       'react-router.ReactRouterDom',
       'react.React',
       'material-ui.MaterialCore',
@@ -40,13 +42,19 @@ export default (props: OrganizationSelectorProps) => {
       'core.AlertDialog',
     ]);
 
-  const { useState, useEffect } = React;
-  const { useParams } = ReactRouterDom;
+  const { useState, useEffect, useRef } = React;
+  const { useParams, useNavigate } = ReactRouterDom;
   const params = ReactRouterDom.useParams();
+  const navigation = useNavigate();
+
   let organization_id = params[routeParam];
   
   if(props.organization_id && !organization_id) organization_id = props.organization_id;
   if(!organization_id) organization_id = 'default';
+
+  const { loading, organizations, error } = useOrganizationList({ reactory });
+  const { loading: loadingOrganization, organization, error: errorOrganization } = useOrganization({ reactory, organizationId: organization_id });
+
   const {
     Avatar,
     Typography,
@@ -74,30 +82,7 @@ export default (props: OrganizationSelectorProps) => {
   const [showNewOrganizationDialog, setShowNewOrganizationDialog] = useState(false);
   const [newOrganizationName, setNewOrganizationName] = useState("");
 
-  const [provider] = useState(new Models.CoreOrganizationList({
-    reactory,
-    active_organization_id: organization_id,
-    onLoadComplete: (organisation, organisations) => {
-      if (loaded === false) {
-        if (unloading === false) {
-          setIsLoaded(true);
-          setOrganisation(organisation);
-          setOrganisations(organisations);
-        }
-      }
-    }
-  }));
-
-  useEffect(() => {
-    if (unloading === false && loaded === true) {
-      debugger
-      if (organisation.id !== organization_id) {
-        provider.setActiveOrganisation(organization_id)
-        setVersion(version + 1)
-      }
-    }
-  }, [organization_id]);
-
+  
   useEffect(() => {
 
     return () => {
@@ -148,7 +133,7 @@ export default (props: OrganizationSelectorProps) => {
 
   const SelectOrganisationDialog = () => {
     const availableAlphabet = uniq(
-      sortedUniqBy(provider.organisations, (org) =>
+      sortedUniqBy(provider.current.organisations, (org) =>
         org.name.substring(0, 1).toUpperCase()
       ).map((org) => org.name.substring(0, 1).toUpperCase())
     );
@@ -165,19 +150,19 @@ export default (props: OrganizationSelectorProps) => {
           <ul>
             <ListSubheader>{letter}</ListSubheader>
             {filter(
-              provider.organisations,
+              provider.current.organisations,
               (org) => org.name.substring(0, 1).toUpperCase() === letter
             ).map((org, org_id) => {
               const onOrganisationSelected = () => {
                 //setOrganisation(org);
-                provider.setActiveOrganisation(org);
+                provider.current.setActiveOrganisation(org);
                 setShowOrganisationSelector(false);
                 if (onOrganizationChanged) onOrganizationChanged(org);
               };
 
               return (
                 <ListItem
-                  selected={provider.organisation.id === org.id}
+                  selected={provider.current.organisation.id === org.id}
                   onClick={onOrganisationSelected}
                   dense
                   button
@@ -233,12 +218,12 @@ export default (props: OrganizationSelectorProps) => {
   };
 
   const onFavoriteOrganisation = () => {
-    if (provider.default_organisation_id !== provider.organisation.id)
-      provider.default_organisation_id = provider.organisation.id;
-    else provider.default_organisation_id = null;
+    if (provider.current.default_organisation_id !== provider.current.organisation.id)
+      provider.current.default_organisation_id = provider.current.organisation.id;
+    else provider.current.default_organisation_id = null;
 
-    provider.__v += 1;
-    provider.persist();
+    provider.current.__v += 1;
+    provider.current.persist();
   };
 
   const onNewOrganization = () => {
@@ -246,9 +231,9 @@ export default (props: OrganizationSelectorProps) => {
   }
 
   const tooltip_title =
-    provider.organisation.id === provider.default_organisation_id
-      ? `Click to unset ${provider.organisation.name} as your default organisation`
-      : `Click to make ${provider.organisation.name} your default organisation`;
+    provider.current.organisation.id === provider.current.default_organisation_id
+      ? `Click to unset ${provider.current.organisation.name} as your default organisation`
+      : `Click to make ${provider.current.organisation.name} your default organisation`;
 
   const display_avatar = variant.indexOf('avatar') >= 0;
   const display_label = variant.indexOf('label') >= 0;
@@ -302,9 +287,9 @@ export default (props: OrganizationSelectorProps) => {
   return (
     <div className={classes.logged_in_organisation}>
       {display_selectOrgButton && (<Button onClick={onOrganisationSelectorClick} variant='outlined' color='primary'>Select Organisation</Button>)}
-      {display_avatar && <Avatar variant="square" className={classes.organisation_avatar} src={provider.organisation.avatarURL || provider.organisation.logoURL}>{provider.organisation.name ? provider.organisation.name.substring(0, 1) : 'L'}</Avatar>}
-      {display_label && <Typography className={classes.organisation_name}>{provider.organisation.name ? provider.organisation.name : 'Loading'}</Typography>}
-      {display_default && has_multiple === true ? <Tooltip title={tooltip_title}><Icon onClick={onFavoriteOrganisation} className={`${classes.favorite_icon} ${provider.organisation.id === provider.default_organisation_id ? classes.favorite_selected : ''}`}>verified</Icon></Tooltip> : null}
+      {display_avatar && <Avatar variant="square" className={classes.organisation_avatar} src={provider.current.organisation.avatarURL || provider.current.organisation.logoURL}>{provider.current.organisation.name ? provider.current.organisation.name.substring(0, 1) : 'L'}</Avatar>}
+      {display_label && <Typography className={classes.organisation_name}>{provider.current.organisation.name ? provider.current.organisation.name : 'Loading'}</Typography>}
+      {display_default && has_multiple === true ? <Tooltip title={tooltip_title}><Icon onClick={onFavoriteOrganisation} className={`${classes.favorite_icon} ${provider.current.organisation.id === provider.current.default_organisation_id ? classes.favorite_selected : ''}`}>verified</Icon></Tooltip> : null}
       {display_toggle && has_multiple === true && onOrganizationChanged ? <IconButton onClick={onOrganisationSelectorClick}><Icon>more_vert</Icon></IconButton> : null}
       {display_new && <IconButton onClick={onNewOrganization}><Icon>add</Icon></IconButton>}
       <AlertDialog
@@ -322,7 +307,7 @@ export default (props: OrganizationSelectorProps) => {
             label="Organization Name"
             placeholder="eg: ACME CORP"
             value={newOrganizationName}
-            fillWidth
+            fullWidth
             onChange={onNewOrganizationNameChange} /> 
       </AlertDialog>
       <SelectOrganisationDialog />
