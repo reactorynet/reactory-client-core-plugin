@@ -6,10 +6,17 @@
  */
 import Reactory from '@reactory/reactory-core'
 
+type PasswordResetFormDeps = {
+  React: Reactory.React,
+  ReactoryForm: React.FC<any>,
+  ReactRouter: Reactory.Routing.ReactRouterDom,
+  Material: Reactory.Client.Web.IMaterialModule
+}
+
 export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
   const { reactory } = props;
 
-  const { React, ReactoryForm, ReactRouter, Material } = reactory.getComponents(
+  const { React, ReactoryForm, ReactRouter, Material } = reactory.getComponents<PasswordResetFormDeps>(
     [
       "react.React",
       "react-router.ReactRouter",
@@ -32,10 +39,7 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
     Icon,
     Typography,
   } = MaterialCore;
-
-  const [error, setError] = useState(null);
-  const [passwordUpdated, setIsPasswordUpdated] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
+ 
   const [formData, setFormData] = useState({
     user: reactory.getUser(),
     password: "",
@@ -43,7 +47,7 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
     authToken: localStorage.getItem("auth_token"),
   });
 
-  const history = ReactRouter.useHistory();
+  const navigation = ReactRouter.useNavigate();
 
   const classes = MaterialStyles.makeStyles((theme) => {
     return {
@@ -168,7 +172,6 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
         resetToken: null,
       })
       .then((forgotResult) => {
-        setIsPasswordUpdated(true);
         reactory.createNotification(
           "Your password has been updated, you will be redirected momentarily",
           {
@@ -184,7 +187,8 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
         ) || "/";
         if(last_route && last_route.includes('reset-password')) last_route = "/"
         setTimeout(() => {
-          history.push(last_route);
+          //history.push(last_route);
+          navigation(last_route);
         }, 3501);
       })
       .catch((error) => {
@@ -328,7 +332,7 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
   );
 };
 
-const PasswordResetFormRegistration: Reactory.Forms.IReactoryComponentRegistryEntry =  {
+const PasswordResetFormRegistration: Reactory.Client.IReactoryComponentRegistryEntry<typeof PasswordResetForm> =  {
   nameSpace: "core",
   name: "ResetPassword",
   component: PasswordResetForm,

@@ -8,7 +8,7 @@
   "homepage": "https://bitbucket.org/reactory/reactory-core-client-plugin#readme",
   "scripts": {
     "build": "npx babel src --out-file lib/reactory.core.js",
-    "start": "NODE_PATH=./src npx nodemon --exec npx babel-node ./src/index.js",
+    "start": "rollup --config --watch rollup.config.js",
     "rollup": "rollup --config rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "npm run release",
@@ -19,7 +19,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@reactory/reactory-core": "file:../artifacts/reactory-reactory-core-1.0.0.tgz",
+    "@reactory/reactory-core": "file:../artifacts/reactory-reactory-core-1.0.3.tgz",
     "core-js": "^3.1.4",
     "styled-jsx": ">= 3.x.x"
   },

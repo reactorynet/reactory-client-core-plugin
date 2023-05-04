@@ -1,5 +1,5 @@
-import queries from './queries';
-import GRAPHQL from './queries';
+import queries from '../graph/queries';
+import GRAPHQL from '../graph/queries';
 
 export const LoadingOrganisation = {
   id: 'loading',

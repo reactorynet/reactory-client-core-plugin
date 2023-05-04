@@ -1,16 +1,32 @@
-import { useReactory } from "@reactory/client-core/api";
+import ReactAlias from 'react';
+import Reactory from "@reactory/reactory-core";
 
-export const CreateUserMembership = (props) => {
+type CreateUserMembershipProps = {
+  reactory: Reactory.Client.IReactoryApi;
+  user: Reactory.Client.Models.IUser;
+  onMembershipCreated?: (membership: Partial<Reactory.Models.IMembership>) => void;
+}
 
-  const reactory = useReactory()
+interface Organisation {
+  id: string;
+  name: string;
+  logo: string
+}
 
-
-
+export const CreateUserMembership = (props: CreateUserMembershipProps) => {
+  const { reactory, onMembershipCreated } = props;
   const {
-    React, ReactoryForm,
-    ReactRouter, Material, ReactoryMembershipRoles } = reactory.getComponents([
+    React, 
+    ReactoryForm,
+    Material, 
+    ReactoryMembershipRoles } = reactory.getComponents<{
+      React: typeof ReactAlias,
+      ReactoryForm: ReactAlias.FC<Partial<Reactory.Forms.IReactoryForm>>,
+      Material: Reactory.Client.Web.IMaterialModule,
+      ReactoryMembershipRoles: ReactAlias.FC<unknown>
+    }>([
       'react.React',
-      'react-router.ReactRouter',
+      'react-router.ReactRouterDom',
       'core.ReactoryMembershipRoles',
       'core.ReactoryForm',
       'material-ui.Material']);
@@ -31,7 +47,9 @@ export const CreateUserMembership = (props) => {
     authToken: localStorage.getItem('auth_token')
   });
 
-  const history = ReactRouter.useHistory();
+  const [organisation, setOrganisations] = useState<Organisation[]>([]);
+
+  
 
   const classes = MaterialStyles.makeStyles((theme) => {
     return {
@@ -51,24 +69,53 @@ export const CreateUserMembership = (props) => {
 
     return (
       <>
-        <ReactoryMembershipRoles user={props.user} membership={{ id: null, organization: null, businessUnit: null, roles: formData }} onChange={(membership) => {
-          onChange(membership.roles)
+        <ReactoryMembershipRoles 
+          user={props.user} 
+          membership={{ 
+            id: null, 
+            organization: null, 
+            businessUnit: null, 
+            roles: formData }} onChange={(membership) => {
+            onChange(membership.roles)
         }} />
       </>
     )
   };
 
-
-  reactory.componentRegister['core.ReactoryRoleSelector@1.0.0'] = {
+  const roleSelectorRegistryEntry: Reactory.Client.IReactoryComponentRegistryEntry<typeof ReactoryRoleSelector> = {
     nameSpace: 'core',
     name: 'ReactoryRoleSelector',
     component: ReactoryRoleSelector,
-    version: '1.0.0'
-  }
+    version: '1.0.0',
+    componentType: 'widget'
+  };
+
+  useEffect(() => {
+    reactory.registerComponent(
+      roleSelectorRegistryEntry.nameSpace,
+      roleSelectorRegistryEntry.name,
+      roleSelectorRegistryEntry.version,
+      roleSelectorRegistryEntry.component,
+      [],
+      ["ADMIN"],
+      true,
+      [],
+      roleSelectorRegistryEntry.componentType,
+    );
+    return () => {
+      reactory.unregisterComponent("core.ReactoryRoleSelector@1.0.0");
+    };
+  }, []);
 
   const onSubmit = ({ formData, uiSchema, schema, errors, formContext }) => {
 
-    reactory.log(`onSubmit`, { formData, uiSchema, schema, errors, formContext }, 'error');
+    reactory.log(`onSubmit`, { 
+      formData, 
+      uiSchema, 
+      schema, 
+      errors, 
+      formContext 
+    }, 'error');
 
     const {
       organization,
@@ -93,7 +140,7 @@ export const CreateUserMembership = (props) => {
       }
     }`;
 
-    reactory.graphqlMutation(mutation, { user_id: props.user.id, organization, businessUnit, roles }).then(({ data, errors = [] }) => {
+    reactory.graphqlMutation<any, any>(mutation, { user_id: props.user.id, organization, businessUnit, roles }).then(({ data, errors = [] }) => {
 
       if (errors.length > 0) {
         reactory.log(`Could not create the new the role`, { errors }, 'errors');
@@ -112,6 +159,7 @@ export const CreateUserMembership = (props) => {
             }
           }
           reactory.createNotification(`New membership created for ${props.user.firstName} ${props.user.lastName}${message}`, { type: 'success', showInAppNotification: true });
+          if(onMembershipCreated) onMembershipCreated({ id, organization, businessUnit, roles })
         }
       }
 
@@ -146,7 +194,7 @@ export const CreateUserMembership = (props) => {
       }  
 `;
 
-    return {
+    const CreateMembershipForm: Reactory.Forms.IReactoryForm = {
       id: 'CreateUserMembership',
       uiFramework: 'material',
       uiSupport: ['material'],
@@ -157,7 +205,7 @@ export const CreateUserMembership = (props) => {
       name: 'CreateUserMembership',
       nameSpace: 'forms',
       version: '1.0.0',
-      backButton: true,
+      backButton: false,
       helpTopics: ['create-new-user-role'],
       roles: ['ADMIN'],
       widgetMap: [{
@@ -190,6 +238,14 @@ export const CreateUserMembership = (props) => {
         },
       },
       uiSchema: {
+        "ui:form": {
+          submitProps: {
+            variant: 'contained',
+            iconAlign: 'right',
+            title: reactory.i18n.t("reactory.forms.create_membership.submit_title", "ADD MEMBERSHIP"),
+          },
+          submitIcon: 'shield_person',          
+        },
         organization: {
           'ui:widget': 'SelectWithDataWidget',
           'ui:options': {
@@ -235,20 +291,10 @@ export const CreateUserMembership = (props) => {
       }
     };
 
+    return CreateMembershipForm;
   }
 
   const onValidate = (formData, errors, formContext, method) => {
-    const { password, confirmPassword } = formData;
-
-    // if (password !== confirmPassword) {
-    //   errors.confirmPassword.addError("Confirm password must match the password");
-
-    //   if (method === "submit") {
-    //     reactory.createNotification("The passwords do not match, please check your input",
-    //       { type: "warning", canDismiss: true, timeOut: 3500, showInAppNotification: false });
-    //   }
-    // }
-
     return errors;
   }
 
@@ -267,9 +313,12 @@ export const CreateUserMembership = (props) => {
 
 };
 
-export default {
+const ReactoryCreateUserMembershipRegistryEntry: Reactory.Client.IReactoryComponentRegistryEntry<typeof CreateUserMembership> = {
   nameSpace: 'core',
   name: 'ReactoryCreateUserMembership',
   component: CreateUserMembership,
   version: '1.0.0',
+  componentType: 'form'
 }
+
+export default ReactoryCreateUserMembershipRegistryEntry
