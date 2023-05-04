@@ -1,10 +1,10 @@
 import { ReactoryClientCore } from "types";
 import { 
   CoreOrganisationWithId,
-  
+  CreateOrganization
 } from "../graph/queries"
-type OrganizationQueryResult {
-  CoreOrganisationWithId: ReactoryClientCore.Models.IOranization;
+type OrganizationCreateMutationResult = {
+  CreateOrganization: ReactoryClientCore.Models.IOranization;
 }
 
 export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook = 
@@ -33,13 +33,12 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
   const saveOrganisation = useCallback(async (): Promise<void> => {
     setLoading(true);
     const { data, errors } = await reactory.graphqlMutation<
-      OrganizationQueryResult, 
-      { id: string, organization: ReactoryClientCore.Models.IOranization 
+      OrganizationCreateMutationResult, 
+      { input: ReactoryClientCore.Models.IOranization 
     }>(
-      CoreOrganisationWithId, 
+      CreateOrganization, 
       { 
-        id: organizationId,
-        organization: organization
+        input: organization
       });
     setLoading(false);
     if(errors && errors.length > 0) {
@@ -48,12 +47,12 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
       return;
     }
 
-    if(!data.CoreOrganisationWithId) {
+    if(!data.CreateOrganization) {
       setError(`No organization found for id ${organizationId}`);        
       return;
     }
 
-    setOrganization(data.CoreOrganisationWithId);
+    setOrganization(data.CreateOrganization);
   }, [organization])
 
   const deleteOrganisation = async (next: ReactoryClientCore.Models.IOranization): Promise<void> => {
@@ -63,7 +62,7 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
   const load = useCallback(
     async () => {
       setLoading(true);
-      const { data, error, errors } = await reactory.graphqlQuery<OrganizationQueryResult, { id: string }>(CoreOrganisationWithId, { id: organizationId });
+      const { data, error, errors } = await reactory.graphqlQuery<{ CoreOrganizationWithId: ReactoryClientCore.Models.IOranization }, { id: string }>(CoreOrganisationWithId, { id: organizationId });
       setLoading(false);
       if(error || errors) {
         const errorString: string = error ? error.message : errors.map(e => e.message).join('\n');
@@ -71,12 +70,12 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
         return;
       }
 
-      if(!data.CoreOrganisationWithId) {
+      if (!data.CoreOrganizationWithId) {
         setError(`No organization found for id ${organizationId}`);        
         return;
       }
 
-      setOrganization(data.CoreOrganisationWithId);
+      setOrganization(data.CoreOrganizationWithId);
     },
     [reactory, organizationId],
   );
@@ -88,11 +87,14 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
   
 
   return {
-    organisation: organization,
+    organization,
     loading,
     error,
+    dirty,
+    deleted,
+    setOrganization: updateOrganisation,
     update: updateOrganisation,
-    save: saveOrganisation,
+    create: saveOrganisation,
     delete: deleteOrganisation,
   }
 
@@ -100,10 +102,11 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
 
 const useOrganizationReactoryRegistration: Reactory.Client.IReactoryComponentRegistryEntry<ReactoryClientCore.Hooks.OrganizationHook> = {
   name: 'useOrganization',
-  namespace: 'core',
-  type: 'hook',
+  nameSpace: 'core',
   version: '1.0.0',
   component: useOrganization,
+  componentType: 'hook',
+  title: 'Organization Hook',  
   description: 'A hook to manage organization state',
   tags: ['hook', 'organization', 'state'],
 };

@@ -11,11 +11,7 @@ export type OrganizationSelectorProps = {
   organization_id?: string
 }
 
-export interface CoreSetOranizationResult {
-  success: boolean
-  message: boolean
-  organization: Reactory.Models.IOrganization
-}
+export type CoreSetOranizationResult = Reactory.Models.IOrganization;
 
 export default (props: OrganizationSelectorProps) => {
   const {
@@ -26,7 +22,9 @@ export default (props: OrganizationSelectorProps) => {
     routeParam = 'organization_id'
   } = props;
 
-
+  const {
+    i18n,
+  } = reactory;
   const { React, ReactRouterDom, MaterialCore, MaterialStyles, AlertDialog } =
     reactory.getComponents<{ 
       React: Reactory.React, 
@@ -52,8 +50,20 @@ export default (props: OrganizationSelectorProps) => {
   if(props.organization_id && !organization_id) organization_id = props.organization_id;
   if(!organization_id) organization_id = 'default';
 
-  const { loading, organizations, error } = useOrganizationList({ reactory });
-  const { loading: loadingOrganization, organization, error: errorOrganization } = useOrganization({ reactory, organizationId: organization_id });
+  const { 
+    loading: loadingOrganizations, 
+    organizations, 
+    error: errorOrganizations,
+    defaultOrganizationId,
+  } = useOrganizationList({ reactory });
+
+  const { 
+    loading: loadingOrganization, 
+    organization,
+    setOrganization,
+    create,
+    update, 
+    error: errorOrganization } = useOrganization({ reactory, organizationId: organization_id });
 
   const {
     Avatar,
@@ -64,6 +74,7 @@ export default (props: OrganizationSelectorProps) => {
     Paper,
     List,
     ListItem,
+    ListItemButton,
     ListItemText,
     ListItemIcon,
     ListSubheader,
@@ -74,35 +85,17 @@ export default (props: OrganizationSelectorProps) => {
 
   const [showOrganisationSelector, setShowOrganisationSelector] = useState(show_selector);
   const [version, setVersion] = useState(0);
-  const [loaded, setIsLoaded] = useState(false);
-  const [organisation, setOrganisation] = useState(Models.LoadingOrganisation);
-  const [organisations, setOrganisations] = useState([Models.LoadingOrganisation]);
   const [unloading, setIsUnloading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [showNewOrganizationDialog, setShowNewOrganizationDialog] = useState(false);
   const [newOrganizationName, setNewOrganizationName] = useState("");
 
-  
-  useEffect(() => {
-
-    return () => {
-      setIsUnloading(true);
-    };
-  }, [])
-
-  useEffect(() => {
-    if (onOrganizationChanged && organisation) {
-      if (organisation && organisation.id !== 'default' && organisation.id !== "loading" && organization_id !== organisation.id) {
-        onOrganizationChanged(organisation);
-      }
-
-    }
-  }, [organisation])
 
   const classes = makeStyles((theme) => {
     return {
       logged_in_organisation: {
         display: 'flex',
+        margin: '8px',
       },
       organisation_avatar: {
         color: theme.palette.primary.main,
@@ -133,7 +126,7 @@ export default (props: OrganizationSelectorProps) => {
 
   const SelectOrganisationDialog = () => {
     const availableAlphabet = uniq(
-      sortedUniqBy(provider.current.organisations, (org) =>
+      sortedUniqBy(organizations, (org) =>
         org.name.substring(0, 1).toUpperCase()
       ).map((org) => org.name.substring(0, 1).toUpperCase())
     );
@@ -141,40 +134,37 @@ export default (props: OrganizationSelectorProps) => {
     const grouped_items = availableAlphabet.map((letter, index) => {
       return (
         <li
-          key={letter}
-          className={
-            classes && classes.userListSubheader
-              ? classes.userListSubheader
-              : ''
-          }>
+          key={letter}>
           <ul>
             <ListSubheader>{letter}</ListSubheader>
             {filter(
-              provider.current.organisations,
+              organizations,
               (org) => org.name.substring(0, 1).toUpperCase() === letter
             ).map((org, org_id) => {
               const onOrganisationSelected = () => {
                 //setOrganisation(org);
-                provider.current.setActiveOrganisation(org);
                 setShowOrganisationSelector(false);
-                if (onOrganizationChanged) onOrganizationChanged(org);
+                if (onOrganizationChanged) {
+                  onOrganizationChanged(org);
+                }
               };
 
               return (
                 <ListItem
-                  selected={provider.current.organisation.id === org.id}
                   onClick={onOrganisationSelected}
                   dense
-                  button
                   key={org_id}>
-                  <Avatar
-                    variant='square'
-                    alt={org.name}
-                    src={org.avatarURL || org.logoURL}
-                    onClick={onOrganisationSelected}>
-                    {org.name.substring(0, 1)}
-                  </Avatar>
-                  <ListItemText inset primary={org.name} />
+                  <ListItemButton
+                    selected={organization?.id === org.id}>                    
+                    <Avatar
+                      variant='square'
+                      alt={org.name}
+                      src={org.avatarURL || org.logoURL}
+                      onClick={onOrganisationSelected}>
+                      {org.name.substring(0, 1)}
+                    </Avatar>
+                    <ListItemText inset primary={org.name} />
+                  </ListItemButton>
                 </ListItem>
               );
             })}
@@ -208,32 +198,29 @@ export default (props: OrganizationSelectorProps) => {
     );
   };
 
-
-  //const LoggedInOrganisationButton = () => {
-
-  const has_multiple = organisations.length > 1;
+  const has_multiple = organizations.length > 1;
 
   const onOrganisationSelectorClick = () => {
     setShowOrganisationSelector(!showOrganisationSelector);
   };
 
   const onFavoriteOrganisation = () => {
-    if (provider.current.default_organisation_id !== provider.current.organisation.id)
-      provider.current.default_organisation_id = provider.current.organisation.id;
-    else provider.current.default_organisation_id = null;
+    // if (provider.current.default_organisation_id !== provider.current.organisation.id)
+    //   provider.current.default_organisation_id = provider.current.organisation.id;
+    // else provider.current.default_organisation_id = null;
 
-    provider.current.__v += 1;
-    provider.current.persist();
+    // provider.current.__v += 1;
+    // provider.current.persist();
   };
 
   const onNewOrganization = () => {
     setShowNewOrganizationDialog(true);
   }
 
-  const tooltip_title =
-    provider.current.organisation.id === provider.current.default_organisation_id
-      ? `Click to unset ${provider.current.organisation.name} as your default organisation`
-      : `Click to make ${provider.current.organisation.name} your default organisation`;
+  const tooltip_title = organization && organization?.id ? 
+    (organization?.id === defaultOrganizationId
+      ? `Click to unset ${organization?.name} as your default organisation`
+      : `Click to make ${organization?.name} your default organisation`) : "";
 
   const display_avatar = variant.indexOf('avatar') >= 0;
   const display_label = variant.indexOf('label') >= 0;
@@ -244,72 +231,47 @@ export default (props: OrganizationSelectorProps) => {
   const display_selectOrgButton =
     variant.indexOf('selectOrganisationButton') >= 0;
 
-    /**
-     * shortcut / helper function that executes organization 
-     * creation
-     */
-  const createOrganization = () => {
-
-    //helper interfaces 
-    interface CreateOrganizationVariable {
-      id: string
-      name: string
+  const onNewOrganizationNameChange = (evt) => {
+    if(organization === null || organization === undefined) {
+      setOrganization({ name: evt.target.value, code: 'NOT-SET', logo: null });
+    } else {
+      setOrganization({...organization, name: evt.target.value });
     }
-
-    interface CreateOrganizationMutationResult {
-      CoreSetOrganisationInfo: CoreSetOranizationResult
-    }
-
-    
-    reactory.graphqlMutation<CreateOrganizationMutationResult, 
-      CreateOrganizationVariable>(Queries.CoreSetOrganisationInfo, 
-        { id: 'new', name: newOrganizationName }).then((result) => {
-      const { data, errors = [] } = result;
-
-      if (data && data.CoreSetOrganisationInfo) {
-        const { organization, success, message } = data.CoreSetOrganisationInfo;
-        reactory.createNotification(`${message}`, { type: success === true ? 'success' : 'error' })
-        onOrganizationChanged(new Models.CoreOrganisationModel({ reactory, ...organization }));
-        setShowNewOrganizationDialog(false);
-      }
-
-      if (errors.length > 0) {
-        reactory.createNotfication('Errors reported during organization creation, please check error log for details');
-        reactory.log('Errors reported from graphql', errors, 'error')
-      }
-    });
   }
 
-  const onNewOrganizationNameChange = (evt) => {
-    setNewOrganizationName(evt.target.value)
+  const NewOrganizationWidget = (<>
+          <MaterialCore.TextField
+            id="newOrganization"
+            label="Organization Name"
+            placeholder="eg: ACME CORP"
+            value={organization?.name}
+            fullWidth
+            onChange={onNewOrganizationNameChange}
+            style={{ margin: '1rem 0' }}
+             />
+          <Button onClick={create}>{i18n.t("reactory:reactory.organizations.create_new_cta", "CREATE ORGANIZATION").toUpperCase()}</Button> 
+      </>)
+
+  if(loadingOrganizations === true) {
+    return <>...</>
+  }
+
+  if(errorOrganizations !== null && errorOrganizations !== undefined) {
+    return <>Error loading organizations</>
+  }
+
+  if(organizations.length === 0) {
+    return NewOrganizationWidget
   }
 
   return (
     <div className={classes.logged_in_organisation}>
       {display_selectOrgButton && (<Button onClick={onOrganisationSelectorClick} variant='outlined' color='primary'>Select Organisation</Button>)}
-      {display_avatar && <Avatar variant="square" className={classes.organisation_avatar} src={provider.current.organisation.avatarURL || provider.current.organisation.logoURL}>{provider.current.organisation.name ? provider.current.organisation.name.substring(0, 1) : 'L'}</Avatar>}
-      {display_label && <Typography className={classes.organisation_name}>{provider.current.organisation.name ? provider.current.organisation.name : 'Loading'}</Typography>}
-      {display_default && has_multiple === true ? <Tooltip title={tooltip_title}><Icon onClick={onFavoriteOrganisation} className={`${classes.favorite_icon} ${provider.current.organisation.id === provider.current.default_organisation_id ? classes.favorite_selected : ''}`}>verified</Icon></Tooltip> : null}
+      {display_avatar && <Avatar variant="square" className={classes.organisation_avatar} src={organization?.avatarURL || organization?.logoURL}>{organization?.name ? organization?.name.substring(0, 1) : 'L'}</Avatar>}
+      {display_label && <Typography className={classes.organisation_name}>{organization?.name ? organization?.name : 'Loading'}</Typography>}
+      {display_default && has_multiple === true ? <Tooltip title={tooltip_title}><Icon onClick={onFavoriteOrganisation} className={`${classes.favorite_icon} ${organization?.id === defaultOrganizationId ? classes.favorite_selected : ''}`}>verified</Icon></Tooltip> : null}
       {display_toggle && has_multiple === true && onOrganizationChanged ? <IconButton onClick={onOrganisationSelectorClick}><Icon>more_vert</Icon></IconButton> : null}
       {display_new && <IconButton onClick={onNewOrganization}><Icon>add</Icon></IconButton>}
-      <AlertDialog
-        open={showNewOrganizationDialog === true}
-        title={`Create new organization`}
-        content={`Click anywhere outside the window to close / cancel the creation`}
-        onAccept={createOrganization}
-        onClose={() => setShowNewOrganizationDialog(false)}
-        cancelTitle='Close'
-        acceptTitle={`ADD ${newOrganizationName}`}
-        showAccept={true}
-        cancelProps={{}}>
-          <MaterialCore.TextField
-            id="newOrganization"
-            label="Organization Name"
-            placeholder="eg: ACME CORP"
-            value={newOrganizationName}
-            fullWidth
-            onChange={onNewOrganizationNameChange} /> 
-      </AlertDialog>
       <SelectOrganisationDialog />
     </div>
   );

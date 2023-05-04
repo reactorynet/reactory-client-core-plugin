@@ -42,6 +42,8 @@ declare namespace ReactoryClientCore {
       organizations: Models.OrganizationList
       loading: boolean
       error?: string
+      defaultOrganizationId?: string
+      setDefaultOrganization: (organizationId: string) => void
     }
 
     export type OrganizationListHook = (props: OrganizationListHookProps) => OrganizationListHookReturn
@@ -57,9 +59,10 @@ declare namespace ReactoryClientCore {
       error?: string
       dirty: boolean
       deleted: boolean
+      setOrganization: (organization: ReactoryClientCore.Models.Organization) => void
       update: (organization: ReactoryClientCore.Models.Organization) => void
       delete: (organization: ReactoryClientCore.Models.Organization) => Promise<void>
-      save: () => Promise<void>
+      create: (organization: ReactoryClientCore.Models.Organization) => Promise<void>
     }
 
     export type OrganizationHook = (props: OrganizationHookProps) => OrganizationHookReturn;

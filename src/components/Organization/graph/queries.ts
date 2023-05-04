@@ -27,7 +27,7 @@ query CoreOrganizations  {
 
 export const CoreOrganisationWithId = `
 query CoreOrganisationWithId($id: String!) {
-  CoreOrganisationWithId(id: $id) {
+  organizationWithId(id: $id) {
     ${base_query}
   }
 }
@@ -41,14 +41,10 @@ mutation CoreSetActiveOrganisation($id: String!) {
 }
 `;
 
-export const CoreSetOrganisationInfo = `
-  mutation CoreSetOrganisationInfo($organisation: CoreOrganisationInput!) {
-    CoreSetOrganisationInfo(organisation: $organisation){
-      success
-      message
-      organisation {
-        ${base_query}
-      }
+export const CreateOrganization = `
+  mutation CreateOrganization($input: CreateOrganizationInput!) {
+    createOrganization(input: $input){
+      ${base_query}
     }
   }
 `;
@@ -58,6 +54,6 @@ export default {
   LoggedInOrganisationQuery,
   CoreOrganizations,
   SetActiveOrganisationMutation,
-  CoreSetOrganisationInfo: CoreSetOrganisationInfo,
+  CoreSetOrganisationInfo: CreateOrganization,
   CoreOrganisationWithId
 };

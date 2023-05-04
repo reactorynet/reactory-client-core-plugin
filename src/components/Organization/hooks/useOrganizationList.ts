@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
 import OrganizationQueries from '../graph/queries'; // Assuming queries are exported from a 'queries' module
 import { ReactoryClientCore } from 'types';
 
 const LOCAL_STORAGE_KEY = 'CoreOrganisationList';
+const LOCAL_STORAGE_DEFAULT_ORG = 'CoreDefaultOrganization';
 
 /**
  * useOrganizationList hook provides a list of organizations and the active organization
@@ -12,11 +12,14 @@ const LOCAL_STORAGE_KEY = 'CoreOrganisationList';
 export const useOrganizationList: ReactoryClientCore.Hooks.OrganizationListHook = 
   (props: ReactoryClientCore.Hooks.OrganizationListHookProps): ReactoryClientCore.Hooks.OrganizationListHookReturn => {
   
+  const { reactory  } = props;
+  const { React } = reactory.getComponents<{ React: Reactory.React }>(["react.React"]);
+  const { useState, useEffect, useCallback } = React;
   const [organizations, setOrganisations] = useState<ReactoryClientCore.Models.OrganizationList>([]);
   const [error, setError] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { reactory  } = props;
+
 
   const load = useCallback(async () => {
     const { 
@@ -41,8 +44,12 @@ export const useOrganizationList: ReactoryClientCore.Hooks.OrganizationListHook 
   }, []);
 
   return {
-    organizations,   
+    organizations,
     error,
-    loading,    
+    loading,
+    setDefaultOrganization(organizationId) {
+      localStorage.setItem(LOCAL_STORAGE_DEFAULT_ORG, organizationId);
+    },
+    defaultOrganizationId: localStorage.getItem(LOCAL_STORAGE_DEFAULT_ORG),
   };
 }
