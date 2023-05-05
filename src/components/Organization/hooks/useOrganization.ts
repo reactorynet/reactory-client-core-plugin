@@ -3,8 +3,12 @@ import {
   CoreOrganisationWithId,
   CreateOrganization
 } from "../graph/queries"
+
+const LOCAL_STORAGE_KEY = 'CoreOrganisationList';
+const LOCAL_STORAGE_DEFAULT_ORG = 'CoreDefaultOrganization';
+
 type OrganizationCreateMutationResult = {
-  CreateOrganization: ReactoryClientCore.Models.IOranization;
+  CreateOrganization: ReactoryClientCore.Models.IOrganization;
 }
 
 export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook = 
@@ -18,13 +22,13 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
     useCallback
   } = React;
 
-  const [organization, setOrganization] = useState<ReactoryClientCore.Models.IOranization>(null);
+  const [organization, setOrganization] = useState<Partial<ReactoryClientCore.Models.IOrganization>>(null);
   const [dirty, setIsDirty] = useState<boolean>(false);
   const [deleted, setIsDeleted] = useState<boolean>(false);
   const [error, setError] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const updateOrganisation = (next: ReactoryClientCore.Models.IOranization) => {
+  const updateOrganisation = (next: ReactoryClientCore.Models.IOrganization) => {
     if(reactory.utils.deepEquals(next, organization)) return;
     setIsDirty(true);
     setOrganization(next);
@@ -34,7 +38,7 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
     setLoading(true);
     const { data, errors } = await reactory.graphqlMutation<
       OrganizationCreateMutationResult, 
-      { input: ReactoryClientCore.Models.IOranization 
+      { input: Partial<ReactoryClientCore.Models.IOrganization> 
     }>(
       CreateOrganization, 
       { 
@@ -55,14 +59,24 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
     setOrganization(data.CreateOrganization);
   }, [organization])
 
-  const deleteOrganisation = async (next: ReactoryClientCore.Models.IOranization): Promise<void> => {
+  const deleteOrganisation = async (next: ReactoryClientCore.Models.IOrganization): Promise<void> => {
 
   }
 
   const load = useCallback(
     async () => {
+      if(!organizationId) return;
+      if(organization && organization.id === organizationId) return;
+      if(organizationId === 'new') {
+        setOrganization({
+          name: '',
+          code: '',
+          logo: '',          
+        });
+        return;
+      }
       setLoading(true);
-      const { data, error, errors } = await reactory.graphqlQuery<{ CoreOrganizationWithId: ReactoryClientCore.Models.IOranization }, { id: string }>(CoreOrganisationWithId, { id: organizationId });
+      const { data, error, errors } = await reactory.graphqlQuery<{ CoreOrganizationWithId: ReactoryClientCore.Models.IOrganization }, { id: string }>(CoreOrganisationWithId, { id: organizationId });
       setLoading(false);
       if(error || errors) {
         const errorString: string = error ? error.message : errors.map(e => e.message).join('\n');
@@ -84,8 +98,6 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
     load();
   }, [load, organizationId]);
 
-  
-
   return {
     organization,
     loading,
@@ -96,11 +108,14 @@ export const useOrganization: ReactoryClientCore.Hooks.OrganizationHook =
     update: updateOrganisation,
     create: saveOrganisation,
     delete: deleteOrganisation,
+    setDefaultOrganization(organizationId) {
+      localStorage.setItem(LOCAL_STORAGE_DEFAULT_ORG, organizationId);
+    },
+    defaultOrganizationId: localStorage.getItem(LOCAL_STORAGE_DEFAULT_ORG),
   }
-
 }
 
-const useOrganizationReactoryRegistration: Reactory.Client.IReactoryComponentRegistryEntry<ReactoryClientCore.Hooks.OrganizationHook> = {
+export const useOrganizationReactoryRegistration: Reactory.Client.IReactoryComponentRegistryEntry<ReactoryClientCore.Hooks.OrganizationHook> = {
   name: 'useOrganization',
   nameSpace: 'core',
   version: '1.0.0',

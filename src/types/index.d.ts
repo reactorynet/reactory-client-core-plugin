@@ -36,14 +36,13 @@ declare namespace ReactoryClientCore {
     
     export interface OrganizationListHookProps {
       reactory: Reactory.Client.IReactoryApi;
+
     }
 
     export type OrganizationListHookReturn = {
       organizations: Models.OrganizationList
       loading: boolean
       error?: string
-      defaultOrganizationId?: string
-      setDefaultOrganization: (organizationId: string) => void
     }
 
     export type OrganizationListHook = (props: OrganizationListHookProps) => OrganizationListHookReturn
@@ -63,6 +62,8 @@ declare namespace ReactoryClientCore {
       update: (organization: ReactoryClientCore.Models.Organization) => void
       delete: (organization: ReactoryClientCore.Models.Organization) => Promise<void>
       create: (organization: ReactoryClientCore.Models.Organization) => Promise<void>
+      defaultOrganizationId?: string
+      setDefaultOrganization: (organizationId: string) => void;
     }
 
     export type OrganizationHook = (props: OrganizationHookProps) => OrganizationHookReturn;
@@ -119,7 +120,7 @@ declare namespace ReactoryClientCore {
   }
 
   export namespace Models {
-    export interface IOranization {
+    export interface IOrganization {
       id: string;
       name: string;
       code?: string
@@ -139,6 +140,6 @@ declare namespace ReactoryClientCore {
       canDelete: boolean
     }
 
-    export type OrganizationList = IOranization[];
+    export type OrganizationList = IOrganization[];
   }
 }
