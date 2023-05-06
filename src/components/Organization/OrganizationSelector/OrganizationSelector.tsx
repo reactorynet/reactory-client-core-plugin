@@ -37,7 +37,7 @@ export default (props: OrganizationSelectorProps) => {
     variant = 'avatar,label,default,toggle,new,selectOrganisationButton',
     show_selector = false,
     routeParam = 'organization_id',
-    organizationRoute = 'organization/:organization_id',
+    organizationRoute = '/organization/:organization_id',
   } = props;
 
   const {
@@ -176,13 +176,13 @@ export default (props: OrganizationSelectorProps) => {
               (org) => org.name.substring(0, 1).toUpperCase() === letter
             ).map((org, org_id) => {
               const onOrganisationSelected = () => {
-                //setOrganisation(org);
                 setShowOrganisationSelector(false);
+                if (organizationRoute) {
+                  navigation(organizationRoute.replace(':organization_id', org.id));
+                }
+
                 if (onOrganizationChanged) {
-                  onOrganizationChanged(org);
-                  if(organizationRoute) {
-                    navigation(organizationRoute.replace(':organization_id', org.id));
-                  }
+                  onOrganizationChanged(org);                  
                 }
               };
 

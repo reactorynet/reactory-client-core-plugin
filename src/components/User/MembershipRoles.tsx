@@ -33,10 +33,8 @@ const ReactoryMembershipRoles = (props: ReactoryMembershipRolesProps) => {
   return (
     <Grid container>
       {membership && reactory.$user.applicationRoles.map((applicationRole: string) => {
-
         const onToggleRole = (evt) => {
-          let roles = [...membership.roles];
-          debugger
+          let roles = [...membership.roles];        
           if (evt.target.checked === false) {
             //remove the role
             reactory.utils.lodash.remove(roles, r => r === applicationRole);
@@ -48,7 +46,6 @@ const ReactoryMembershipRoles = (props: ReactoryMembershipRolesProps) => {
               onChange({ ...membership, roles });
             }
           } else {
-            debugger
             if (auto_update === true) {
               const mutation = `
                       mutation SetMembershipRoles($user_id: String!, $id: String!, $roles: [String]!){

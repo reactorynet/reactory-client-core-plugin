@@ -423,15 +423,14 @@ const Profile = (props: IProfileProps): JSX.Element => {
         }
 
         const deleteMembership = async (membership) => { 
-            const deleteResult = await reactory.graphqlMutation <{RemoveUserMembership: Reactory.Models.CoreSimpleResponse}, any>(`
+            const deleteResult = await reactory.graphqlMutation<{ ReactoryCoreRemoveUserMembership: Reactory.Models.CoreSimpleResponse}, any>(`
                 mutation RemoveUserMembership($user_id: String!, $id: String!) {
                     ReactoryCoreRemoveUserMembership(user_id: $user_id, id: $id) {
                         success
                         message
                     }
                 }
-            `, { id: membership.id, user_id: profile.id });
-            debugger;
+            `, { id: membership.id, user_id: profile.id });        
             const { 
                 data,
                 errors,
@@ -442,10 +441,10 @@ const Profile = (props: IProfileProps): JSX.Element => {
                     type: 'warning'
                 })
             } else {
-                reactory.createNotification(data.RemoveUserMembership.message, {
+                reactory.createNotification(data.ReactoryCoreRemoveUserMembership.message, {
                     type: data.success === true ? 'success' : 'warning'
                 });
-
+                debugger
                 if(refetch) refetch();
                 if(isProfileOwner) await reactory.status()
             }
@@ -478,7 +477,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                             }
 
                             let membershipText = `${t(membership.client.name)} - APPLICATION MEMBERSHIP`;
-
+                            debugger
                             if (membership.organization && membership.organization.name) {
                                 membershipText = `${membership.organization.name}`
                             }

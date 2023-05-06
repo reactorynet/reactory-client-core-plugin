@@ -187,8 +187,8 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
 
 
     const MyOrganisationMemberships = `
-      query MyOrganisationMemberships  {
-        MyOrganisationMemberships {
+      query CoreOrganizations  {
+        CoreOrganizations {
           ${base_query}
         }
       }  
@@ -251,10 +251,10 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
           'ui:options': {
             multiSelect: false,
             query: MyOrganisationMemberships,
-            resultItem: 'MyOrganisationMemberships',
+            resultItem: 'CoreOrganizations',
             resultsMap: {
-              'MyOrganisationMemberships.[].id': ['[].key', '[].value'],
-              'MyOrganisationMemberships.[].name': '[].label',
+              'CoreOrganizations.[].id': ['[].key', '[].value'],
+              'CoreOrganizations.[].name': '[].label',
             },
           },
         },
