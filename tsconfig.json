@@ -8,7 +8,7 @@
     "target": "ES2018",
     "jsx": "preserve",
     "experimentalDecorators": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "strict": false,

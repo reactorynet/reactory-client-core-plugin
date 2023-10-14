@@ -20,7 +20,7 @@ export default {
     format: "umd",
     globals: ['React', 'window'],
     external: ['react', 'react-dom'],
-    sourcemap: false
+    sourcemap: 'both'
   },  
   plugins: [
     replace({
@@ -44,7 +44,7 @@ export default {
       exclude: 'node_modules/**',
       include: ['./src/**/*.ts', './src/**/*.js', './src/**/*.tsx'],
       babelHelpers: "bundled",
-      sourceMaps: "both",
+      sourceMaps: true,
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       presets: [
         [
