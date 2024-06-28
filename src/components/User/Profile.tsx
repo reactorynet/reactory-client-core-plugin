@@ -142,7 +142,7 @@ export interface IProfileProps extends Reactory.IReactoryComponentProps {
     headerComponents?: string[],
     footerComponents?: string[],
     refetch: () => void,
-}
+};
 
 const Profile = (props: IProfileProps): JSX.Element => {
 
@@ -1585,7 +1585,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     }
 
 
-}
+};
 
 type TProfile = typeof Profile;
 

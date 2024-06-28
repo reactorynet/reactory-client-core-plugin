@@ -3,13 +3,18 @@
 const Logout: React.FunctionComponent<Reactory.IReactoryComponentProps> = (props) => {
 
   const React = props.reactory.getComponent<Reactory.React>("react.React");
+  const ReactRouter = props.reactory.getComponent<Reactory.Routing.ReactRouter>("react-router.ReactRouter");
+  const { useNavigate } = ReactRouter;
+  const { useEffect } = React;
 
-  React.useEffect(()=>{
+  const navigate = useNavigate();
+
+  useEffect(() => {
     props.reactory.logout(true);
-  }, [])
+    navigate("/");
+  }, []);
 
-  return (<>Logging out</>);
-
+  return (<>...</>)
 }
 
 const LogoutRegistration: Reactory.Client.IReactoryComponentRegistryEntry<typeof Logout> = {
