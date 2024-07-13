@@ -73,6 +73,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   const [password, setPassword] = React.useState<string>();
   const [loginError, setLoginError] = React.useState<string>();
   const [busy, setBusy] = React.useState<boolean>(false);
+  const [version, setVersion] = React.useState<number>(1);
 
   const PasswordRef = React.useRef<HTMLDivElement>(null)
   
@@ -214,6 +215,13 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
 
       if(!AuthComponent) {
         reactory.log(`Could not load the authentication component ${component} for provider ${provider}`,{},'warning');
+        reactory.on('componentRegistered', (fqn) => {
+          if(fqn === component) { 
+            setVersion(version + 1);
+          }
+          reactory.log(`Component ${component} has been registered, reloading login card`);
+          
+        });
       } else {
         authcomponents.push((<AuthComponent {...componentProps} />))
       }
