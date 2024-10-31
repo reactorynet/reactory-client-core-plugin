@@ -225,8 +225,7 @@ const FroalaWidget = (props) => {
   try {
 
     return (
-      <FormControl>
-        {showLabel && <Typography variant="caption" gutterBottom>{props.schema.title}</Typography>}
+      <FormControl>        
         <FroalaEditor          
           config={config}
           model={model.current}
@@ -237,8 +236,7 @@ const FroalaWidget = (props) => {
   } catch (render_error) {
 
     return (
-      <FormControl>
-        {showLabel && <Typography variant="caption" gutterBottom>{props.schema.title}</Typography>}
+      <FormControl>        
         <p>Waiting for editor ({version})</p>
       </FormControl>
     )

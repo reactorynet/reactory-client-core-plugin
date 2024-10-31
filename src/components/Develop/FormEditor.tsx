@@ -1,6 +1,4 @@
-import {
-    IReactoryFormGraphElementSchema
-} from './schema'
+import Reactory from '@reactory/reactory-core'
 
 interface FormEditorProps {
     reactory: Reactory.Client.IReactoryApi,
@@ -101,10 +99,10 @@ const NEW_FORM_DATA = {
 };
 
 
-const FormEditor = (props: FormEditorProps): JSX.Element => {
+const FormEditor = (props: FormEditorProps): JSX.Element => {    
     const { reactory, formData } = props;
+    debugger;
     const { utils } = reactory;
-
     const { 
         React, 
         Material, 
@@ -113,8 +111,8 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
  
     const [reactoryForm, setReactoryForm] = React.useState<Reactory.Forms.IReactoryForm>(formData ? formData : NEW_FORM_DATA );
     const [formSchemas, setFormSchemas] = React.useState<Reactory.Forms.IReactoryFormSchemas>(DEFAULT_FORM_SCHEMAS);
-    
     const [graphSchema, setDataDefinition] = React.useState({});
+    const [formUiSchemas, setFormUISchemas] = React.useState<Reactory.Schema.IFormUISchema[]>([]);
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -177,12 +175,21 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
                                     id: { type: 'string', title: 'Resource Id' },
                                     name: { type: 'string', title: 'Resource Name' },                                    
                                     uri: { type: 'string', title: 'Resource URI' },
-                                    type: { type: 'string', title: 'Resource Type' },
+                                    type: { 
+                                        type: 'string', 
+                                        title: 'Resource Type', 
+                                        enum: [
+                                            'script', 'style', 'image', 'video', 'audio', 'json', 'xml', 
+                                            'html', 'text', 'pdf', 'binary', 'wasm', 'module', 'font',
+                                            'image', 'icon', 'manifest', 'archive', 'package', 'certificate',
+                                        ] 
+                                    },
                                     required: { type: 'boolean' , title: 'Is Required' },
                                     expr: { type: 'string', title: 'Expression' },
                                     signed: { type: 'boolean', title: 'Is Signed' },
                                     crossOrigin: { type: 'boolean', title: 'Is Cross Origin' },
                                     signature: { type: 'string', title: 'Signature' },
+                                    signatureMethod: { type: 'string', title: 'Signature Method' },
                                 }
                             } 
                         },
@@ -214,7 +221,16 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
                         sanitizeSchema: {
                             type: 'string',
                             title: 'Santize Schema'
-                        },
+                        },                        
+                    }
+                }
+            }
+            case 'uiSchemas': {
+                return {
+                    type: 'object',
+                    title: reactory.i18n.t('reactory.formeditor.uiSchemas.root.title', { schema: 'Form UI Schemas' }),
+                    description: reactory.i18n.t('reactory.formeditor.uiSchemas.root.description', { defaultValue: 'Use args editor to create data input bindings for your form' }),
+                    properties: {
                         uiSchema: {
                             type: 'string',
                             title: 'UI Schema'
@@ -223,97 +239,10 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
                             type: 'array',
                             title: 'UI Schemas',
                             items: {
-                                type: 'object',
-                                title: 'UI Schema',
-                                properties: {
-                                    id: {
-                                        type: 'string',
-                                        title: 'ID',
-                                    },
-                                    title: {
-                                        type: 'string',
-                                        title: 'Title'
-                                    },
-                                    key: {
-                                        type: 'string',
-                                        title: 'Key'
-                                    },
-                                    description: {
-                                        type: 'string',
-                                        title: 'Description'
-                                    },
-                                    icon: {
-                                        type: 'string',
-                                        title: 'Icon'
-                                    },
-                                    uiSchema: {
-                                        type: 'string',
-                                        title: 'UI Schema'
-                                    },
-                                    graphql: {
-                                        type: 'object',
-                                        title: 'GraphQL definition',
-                                        properties: {
-                                            query: {
-                                                type: 'object',
-                                                title: 'Query Definition',
-                                                properties: {
-                                                    name: { type: 'string'},
-                                                    text: { type: 'string' },
-                                                    resultMap: { type: 'object' },
-                                                    resultType: { type: 'string' },
-                                                    resultKey: { type: 'string' },
-                                                    formData: { type: 'object' },
-                                                    variables: { type: 'object' },
-                                                    onSuccessMethod: { type: 'string'},
-                                                    onSuccessEvent: { type: 'object' },
-                                                    mergeStrategy: { type: 'string' },
-                                                    mergeFunction: { type: 'string' },
-                                                    onError: { type: 'string' },
-                                                    options: { type: 'object' },
-                                                    throttle: { type: 'number' },
-                                                    queryMessage: { type: 'string', title: 'Query Message' },
-                                                    props?: { type: 'object', title: 'Static Properties', properties: {  } },                                                    
-                                                    edit?: { type: 'boolean' },
-                                                    new?: { type: 'boolean' },
-                                                    delete?: { type: 'boolean' },
-                                                    autoQuery?: { type: 'boolean' },
-                                                    //the number of milliseconds the autoQuery must be delayed for before executing
-                                                    autoQueryDelay?: { type: 'number' },
-                                                    waitUntil?: { type: 'string' },
-                                                    waitTimeout?: { type: 'number' },
-                                                    interval?: { type: 'number' },
-                                                    useWebsocket?: { type: 'boolean' },
-                                                    notification?: { type: 'object'},
-                                                    refreshEvents?: { type: 'object'},
-                                                }
-                                            },
-                                            mutation: {
-                                                type: 'object',
-                                                title: 'Mutation definition'
-                                            },
-                                            queries: {
-                                                type: 'object',
-                                                title: 'Additional Queries',
-                                                properties: {
-
-                                                }
-                                            }
-                                        }
-                                    },
-                                    modes: {
-                                        type: 'string',
-                                        title: 'Modes'
-                                    },
-                                    userAgents: {
-                                        type: 'string',
-                                        title: 'User Agents'
-                                    }
-
-                                }
+                                type: 'string',
+                                title: 'UI Schema',                                
                             }
                         },
-
                     }
                 }
             }
@@ -332,10 +261,64 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
         }
     }
 
-    const getUISchema = (which: string): Reactory.Schema.IUISchema => {
+    const getUISchema = (which: string): Reactory.Schema.IFormUISchema => {
         switch(which) {
             case 'base': {
-                return {}
+                return {
+                    "ui:form": {
+                    },
+                    "ui:field": "GridLayout",
+                    "ui:grid-layout": [
+                        {
+                            id: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            uiFramework: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            uiSupport: { xs: 12, sm: 12, md: 6, lg: 3 },
+                        },
+                        {
+                            uiResources: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            title: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            tags: { xs: 12, sm: 12, md: 6, lg: 3 },
+                        },
+                        {
+                            avatar: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            icon: { xs: 12, sm: 12, md: 6, lg: 3 },
+                            helpTopics: { xs: 12, sm: 12, md: 6, lg: 3 },
+                        }
+                    ],
+                    id: {
+                        "ui:help": "Provide a unique id for your form",
+                        "ui:placeholder": "Enter a unique id for your form"
+                    },
+                    uiFramework: {
+                        "ui:help": "Select the UI Framework for your form",
+                        "ui:placeholder": "Select the UI Framework for your form",
+                        "ui:widget": "SelectWidget",
+                        "ui:options": {
+                            selectOptions: [
+                                { key: 'material', value: 'material', label: 'Material UI' },
+                                { key: 'bootstrap', value: 'bootstrap', label: 'Bootstrap' },                            
+                            ]
+                        }
+                    },
+                    uiSupport: {
+                        "ui:help": "Select the UI Frameworks supported by your form",
+                        "ui:widget": "SelectWidget",
+                        "ui:options": {
+                            multiple: true,
+                            selectOptions: [
+                                { key: 'material', value: 'material', label: 'Material UI' },
+                                { key: 'bootstrap', value: 'bootstrap', label: 'Bootstrap' },                            
+                            ]
+                        }
+                    },
+                    uiResources: {
+                        "ui:options": {
+                            allowAdd: true,
+                            allowDelete: true,
+                            allowReorder: true,
+                        }                        
+                    }
+                }
             }
             case 'args': {
                 return {}
@@ -344,6 +327,9 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
                 return {}
             }
             case 'preview': {
+                return {}
+            }
+            case 'schema': {
                 return {}
             }
         }
@@ -359,6 +345,7 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
             version: '1.0.0',
             schema: getSchema(which),
             uiSchema: getUISchema(which),
+            helpTopics: [`form-editor-help-${which}`],
             uiFramework: 'material',
             __complete__: true,
             allowClone: false,
@@ -401,12 +388,15 @@ const FormEditor = (props: FormEditorProps): JSX.Element => {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 Schema
+                <ReactoryForm formDef={getFormDefintion('schemas')} />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 UI Schema
+                <ReactoryForm formDef={getFormDefintion('uiSchemas')} />
             </TabPanel>
             <TabPanel value={value} index={3}>
                 Data
+                <ReactoryForm formDef={getFormDefintion('data')} />
             </TabPanel>
             <TabPanel value={value} index={4}>
                 <ReactoryForm formDef={getFormDefintion('preview')} />

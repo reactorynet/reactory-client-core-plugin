@@ -1,4 +1,3 @@
-import { Password } from '@mui/icons-material';
 import Reactory from '@reactory/reactory-core';
 
 interface LoginDependencies {
@@ -12,8 +11,17 @@ interface LoginDependencies {
   React: Reactory.React
 };
 
+
+type AuthProvider = string | {
+  provider: string,
+  component: Reactory.FQN,
+  props?: {
+    [key: string]: any
+  }
+}
+
 interface IReactoryLoginProps extends Reactory.IReactoryComponentProps {
-  authlist?: string[],
+  authlist?: AuthProvider[],
   magicLink?: boolean
 }
 
@@ -28,7 +36,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   //   loggedIn: false,
   //   redirectOnLogin: reactory.utils.lodash.isNil(reactory.queryObject) === false && reactory.queryObject.r ? reactory.queryObject.r : '/'
   // };
-
+  reactory.log(`LoginCard start`, { authlist, magicLink });
   const {
     React,
     BasicModal,
@@ -65,6 +73,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   const [password, setPassword] = React.useState<string>();
   const [loginError, setLoginError] = React.useState<string>();
   const [busy, setBusy] = React.useState<boolean>(false);
+  const [version, setVersion] = React.useState<number>(1);
 
   const PasswordRef = React.useRef<HTMLDivElement>(null)
   
@@ -134,60 +143,87 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   const activeTheme = reactory.getTheme();
 
   authlist.forEach(authType => {
-    switch (authType) {
-      case 'local': {
-        authcomponents.push((
-          <Box style={{ maxWidth: '600px', padding: reactory.muiTheme.spacing(2)  }} key={authType}>
-            <Stack spacing={3} justifyContent="center" alignItems={"center"}>
-              <TextField
-                label="Email"
-                value={username}
-                onChange={updateUsername}
-                disabled={busy}
-                style={{ width: '100%' }}
-                name='reactory-security::standard-login-email'
-                id='reactory-security::standard-login-email'
-                autoFocus={true}
-              />
 
-              <TextField
-                label='Password'
-                type='password'
-                value={password}
-                style={{ width: '100%' }}
-                onChange={updatePassword}
-                onKeyPress={keyPressPassword}
-                name='reactory-security::standard-login-password'
-                id='reactory-security::standard-login-password'
-                ref={(field: HTMLDivElement) => { PasswordRef.current = field }}
-                disabled={busy}
-              />
-
-              <Fab
-                id="reactory-security::standard-login-button"
-                name="reactory-security::standard-login-button"
-                onClick={doLogin}
-                color="primary"
-                disabled={enableLogin === false || busy === true}
-                style={{ marginTop: '20px' }}>
-                <Icon>lock_open</Icon>
-              </Fab>
-
-              <Button onClick={doForgot} color='secondary' id="reactory-security::standard-forgot-password-button" name="reactory-security::standard-forgot-password-button" disabled={busy} style={{ marginTop: '20px' }}>
-                Forgot Password
-              </Button>
-
-              {magicLink === true &&
-                <Button onClick={doEmailLogin} id="reactory-security::standard-send-link-button" name="reactory-security::standard-send-link-button" color='secondary' disabled={busy} style={{ marginTop: '20px' }}>
-                  Send Magic Link
-                </Button>}
-            </Stack>
-          </Box>))
-        break;
+    if(typeof authType === 'string' ) {
+      switch (authType) {
+        case 'local': {
+          authcomponents.push((
+            <Box style={{ maxWidth: '600px', padding: reactory.muiTheme.spacing(2)  }} key={authType}>
+              <Stack spacing={3} justifyContent="center" alignItems={"center"}>
+                <TextField
+                  label="Email"
+                  value={username}
+                  onChange={updateUsername}
+                  disabled={busy}
+                  style={{ width: '100%' }}
+                  name='reactory-security::standard-login-email'
+                  id='reactory-security::standard-login-email'
+                  autoFocus={true}
+                />
+  
+                <TextField
+                  label='Password'
+                  type='password'
+                  value={password}
+                  style={{ width: '100%' }}
+                  onChange={updatePassword}
+                  onKeyPress={keyPressPassword}
+                  name='reactory-security::standard-login-password'
+                  id='reactory-security::standard-login-password'
+                  ref={(field: HTMLDivElement) => { PasswordRef.current = field }}
+                  disabled={busy}
+                />
+  
+                <Fab
+                  id="reactory-security::standard-login-button"
+                  name="reactory-security::standard-login-button"
+                  onClick={doLogin}
+                  color="primary"
+                  disabled={enableLogin === false || busy === true}
+                  style={{ marginTop: '20px' }}>
+                  <Icon>lock_open</Icon>
+                </Fab>
+  
+                <Button onClick={doForgot} color='secondary' id="reactory-security::standard-forgot-password-button" name="reactory-security::standard-forgot-password-button" disabled={busy} style={{ marginTop: '20px' }}>
+                  Forgot Password
+                </Button>
+  
+                {magicLink === true &&
+                  <Button onClick={doEmailLogin} id="reactory-security::standard-send-link-button" name="reactory-security::standard-send-link-button" color='secondary' disabled={busy} style={{ marginTop: '20px' }}>
+                    Send Magic Link
+                  </Button>}
+              </Stack>
+            </Box>))
+          break;
+        }
+        case 'microsoft': {
+          authcomponents.push((<MicrosoftLogin key={authType} /> || <p>Login Button goes here</p>));
+          break;
+        }
       }
-      case 'microsoft': {
-        authcomponents.push((<MicrosoftLogin key={authType} /> || <p>Login Button goes here</p>));
-        break;
+    } else {
+
+      const { provider, component } = authType;
+      const AuthComponent = reactory.getComponent<React.FC>(component);
+      let componentProps = {
+        key: `login_${provider}`,
+      };
+      
+      if(authType.props && typeof authType.props === 'object') {
+        componentProps = { ...componentProps, ...authType.props };
+      }
+
+      if(!AuthComponent) {
+        reactory.log(`Could not load the authentication component ${component} for provider ${provider}`,{},'warning');
+        reactory.on('componentRegistered', (fqn) => {
+          if(fqn === component) { 
+            setVersion(version + 1);
+          }
+          reactory.log(`Component ${component} has been registered, reloading login card`);
+          
+        });
+      } else {
+        authcomponents.push((<AuthComponent {...componentProps} />))
       }
     }
   });
@@ -212,8 +248,6 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   )
 };
 
-
-
 type TLoginCard = typeof LoginCard;
 
 const LoginCardRegistration: Reactory.Client.IReactoryComponentRegistryEntry<TLoginCard> = {
@@ -223,6 +257,7 @@ const LoginCardRegistration: Reactory.Client.IReactoryComponentRegistryEntry<TLo
   version: '1.0.0',
   componentType: "form",
   roles: ["ANON"],
+  title: "Reactory Login Card",
   tags: ["user", "login"]
 }
 

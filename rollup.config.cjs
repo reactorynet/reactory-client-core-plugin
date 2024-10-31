@@ -20,7 +20,12 @@ export default {
     format: "umd",
     globals: ['React', 'window'],
     external: ['react', 'react-dom'],
-    sourcemap: false
+    sourcemap: true,
+    sourcemapBaseUrl: 'http://localhost:4000/cdn/plugins/reactory-client-core/lib',
+    sourcemapIgnoreList: (relativeSourcePath, sourcemapPath) => {
+      // will ignore-list all files with node_modules in their paths
+      return relativeSourcePath.includes('node_modules');
+    },
   },  
   plugins: [
     replace({
@@ -44,7 +49,7 @@ export default {
       exclude: 'node_modules/**',
       include: ['./src/**/*.ts', './src/**/*.js', './src/**/*.tsx'],
       babelHelpers: "bundled",
-      sourceMaps: "both",
+      sourceMaps: true,
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       presets: [
         [

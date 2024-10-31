@@ -413,7 +413,6 @@ class FroalaEditor extends Component<any, any> {
     //console.log('rendering Froala Widget', props);
     return (
       <FormControl classes={props.classes.formControl} fullWidth>
-        <InputLabel htmlFor={props.idSchema.$id} shrink={true}>{props.label}</InputLabel> : null;
         <div
           id={props.idSchema.$id || 'froala-editor'}
           ref={(contentRef) => { this.contentRef = contentRef }}
