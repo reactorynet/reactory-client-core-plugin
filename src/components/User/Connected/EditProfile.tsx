@@ -1,23 +1,23 @@
+import { ReactoryClientCore } from "types";
 
-
-
-
-const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Components.EditProfileProps> = (props) => {
+const EditProfile: React.FunctionComponent<ReactoryClientCore.Components.EditProfileProps> = (props) => {
   const { reactory, organizationId, surveyId, profile, onCancel, withPeers, profileTitle, mode, headerComponents, footerComponents, refetch } = props
   
   const {
     React,
     ApolloClient,
     Profile
-  } = reactory.getComponents<Reactory.Plugins.ClientCore.Components.EditProfileDependencies>([
+  } = reactory.getComponents<ReactoryClientCore.Components.EditProfileDependencies>([
     "apollo-client.ApolloClient@3.2.7",
     "core.Profile",
     "react.React"
-  ])
+  ]);
+
+  const { gql } = reactory.utils;
   
   const { Mutation } = ApolloClient.components;
 
-  const mutation = reactory.utils.gql(`
+  const mutation = gql(`
   mutation UpdateUserMutation($id: String!, $profileData: UpdateUserInput!){
     updateUser(id: $id, profileData: $profileData){
       id
@@ -27,11 +27,9 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
       mobileNumber
       avatar
     }
-  }
-  `);
+  }`);
 
-  const apiStatus = `
-  query status($theme: String, $mode: String) {
+  const apiStatus = gql(`query status($theme: String, $mode: String) {
       apiStatus(theme: $theme, mode: $mode) {
       applicationName
       applicationAvatar
@@ -243,7 +241,7 @@ const EditProfile: React.FunctionComponent<Reactory.Plugins.ClientCore.Component
     }
   }
 
-`;
+`);
 
   return (
     <Mutation mutation={mutation} >

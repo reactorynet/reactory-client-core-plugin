@@ -476,8 +476,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 id = membership.organization.id
                             }
 
-                            let membershipText = `${t(membership.client.name)} - APPLICATION MEMBERSHIP`;
-                            debugger
+                            let membershipText = `${t(membership.client.name)} - APPLICATION MEMBERSHIP`;                            
                             if (membership.organization && membership.organization.name) {
                                 membershipText = `${membership.organization.name}`
                             }
@@ -538,9 +537,9 @@ const Profile = (props: IProfileProps): JSX.Element => {
                     >
                         <Grid container>
 
-                            {selectedMembership && reactory.$user.applicationRoles.map((applicationRole: string) => {
+                            {selectedMembership && reactory.$user.applicationRoles.map((applicationRole: string, idx) => {
                                 if (applicationRole !== 'ANON') {
-                                    return (<Grid item xs={12} sm={12} md={12} lg={12}>
+                                    return (<Grid key={idx} item xs={12} sm={12} md={12} lg={12}>
                                         <FormControlLabel
                                             control={<Switch size="small" checked={reactory.hasRole([applicationRole], selectedMembership.roles)} onChange={(evt) => {
                                                 let roles = [...selectedMembership.roles];
@@ -1305,7 +1304,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 preview = reader.result;
                 //that.setState({ profile: { ...profile, avatar: preview }, imageMustCrop: true, avatarUpdated: true });
                 setProfile({ ...profile, avatar: preview });
-                setImageMustCrop(true);
+                //setImageMustCrop(true);
             }, false);
 
             if (file) {
@@ -1439,9 +1438,9 @@ const Profile = (props: IProfileProps): JSX.Element => {
             };
 
             const deleteUserProfile = e => {
-                const mutation = reactory.utils.gql` mutation DeleteUserMutation($id: String!){
+                const mutation = reactory.utils.gql(`mutation DeleteUserMutation($id: String!){
                     deleteUser(id: $id)
-                } `;
+                }`);
 
                 reactory.graphqlMutation(mutation, { id: profile.id }).then(result => {
                     if (result.errors) {
@@ -1498,8 +1497,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
     }
 
     const renderCropper = () => {
-        const that = this;
-        // const { Cropper, FullScreenModal } = this.componentDefs;
+       
+       
         const onModalClose = () => {
             //this.setState({ imageMustCrop: false })
         };

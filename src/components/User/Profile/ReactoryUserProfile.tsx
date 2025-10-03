@@ -33,19 +33,15 @@ export const ReactoryUserProfile: Reactory.Client.ReactoryFC<ReactoryClientCore.
     Typography,
   } = MaterialCore;
 
-  const styles = MaterialStyles.makeStyles((theme) => {
-    let styles: any = {
-
-    };
-
-    return styles;
-  })({
-    isAdmin,
-    isNew,
-    isOwner,
-    loading,
-    profile
-  })
+  const styles = MaterialStyles.createStyles((theme: { spacing: (arg0: number) => any; }) => ({
+    root: {
+      padding: theme.spacing(2),
+      margin: theme.spacing(2),
+    },
+    title: {
+      marginBottom: theme.spacing(2),
+    }
+  }));
 
   return (
     <Paper>

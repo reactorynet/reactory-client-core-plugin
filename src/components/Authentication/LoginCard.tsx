@@ -22,12 +22,18 @@ type AuthProvider = string | {
 
 interface IReactoryLoginProps extends Reactory.IReactoryComponentProps {
   authlist?: AuthProvider[],
-  magicLink?: boolean
+  magicLink?: boolean,
+  redirectAfterLogin?: boolean,
 }
 
 const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactoryLoginProps) => {
 
-  const { reactory, authlist = ['local'], magicLink = false } = props;
+  const { 
+    reactory, 
+    authlist = ['local'], 
+    magicLink = false, 
+    redirectAfterLogin = true,
+  } = props;
   // this.state = {
   //   username: localStorage ? localStorage.getItem('$reactory$last_logged_in_user') : '',
   //   password: '',
@@ -62,13 +68,14 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
     Box,
     Fab,
     Paper,
-    Grid,
+    // @ts-ignore
+    Grid2,
     Icon,
     Stack,
     TextField,
     Typography,
   } = Material.MaterialCore;
-
+  const Grid = Grid2;
   const [username, setUsername] = React.useState<string>(localStorage ? localStorage.getItem('$reactory$last_logged_in_user') : '');
   const [password, setPassword] = React.useState<string>();
   const [loginError, setLoginError] = React.useState<string>();
@@ -97,7 +104,9 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
       reactory.log(`User login successful, loading user details`, { user: loginResult.user }, 'debug'); 
       reactory.afterLogin(loginResult).then((status: Reactory.Models.IApiStatus) => {       
         reactory.log(`User login successful, redirecting to: ${redirectOnLogin}`, {}, 'debug');         
-        navigate(redirectOnLogin)        
+        if ( redirectAfterLogin ) { 
+          navigate(redirectOnLogin)        
+        }
       }).catch((statusErr) => {
         reactory.log(`Error getting status for user ${username}`, {statusErr}, 'error');
         setBusy(false);
@@ -134,11 +143,6 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
   const { isEmail, isValidPassword } = reactory.utils;
   const enableLogin = isEmail(username) && isValidPassword(password) && !busy;
 
-
-  const {
-    makeStyles
-  } = Material.MaterialStyles
-
   const authcomponents = [];
   const activeTheme = reactory.getTheme();
 
@@ -148,7 +152,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
       switch (authType) {
         case 'local': {
           authcomponents.push((
-            <Box style={{ maxWidth: '600px', padding: reactory.muiTheme.spacing(2)  }} key={authType}>
+            <Box sx={{ maxWidth: '600px', padding: reactory.muiTheme.spacing(2)  }} key={authType}>
               <Stack spacing={3} justifyContent="center" alignItems={"center"}>
                 <TextField
                   label="Email"
@@ -197,7 +201,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
           break;
         }
         case 'microsoft': {
-          authcomponents.push((<MicrosoftLogin key={authType} /> || <p>Login Button goes here</p>));
+          authcomponents.push(MicrosoftLogin ? <MicrosoftLogin key={authType} /> : <p key={authType}>Login Button goes here</p>);
           break;
         }
       }
@@ -228,19 +232,74 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (props: IReactor
     }
   });
 
-  let logoResource = activeTheme.assets.find((e) => e.name === "logo");
+  let logoResource = activeTheme.assets?.find((e) => e.name === "logo");
+  if(!logoResource || !logoResource.url) {
+    logoResource = {
+      name: 'logo',
+      url: 'https://placehold.it/200x200'
+    };
 
+    reactory.log(`No logo resource found, using default`, { 
+      logoResource, 
+      activeTheme: activeTheme?.name, 
+      assetsCount: activeTheme.assets?.length 
+    }, 'warning');
+  }
   return (
-    <Grid container alignItems="center" spacing={{ xs: 2, md: 3, lg: 4 }} columns={{ xs: 2, md: 2, lg: 4 }}>
-      <Grid item xs={12} lg={12} alignContent="center">
-        <Logo backgroundSrc={logoResource?.url} />
+    <Grid 
+      container
+      spacing={{ xs: 2, md: 4 }}
+      sx={{ 
+        minHeight: '100vh', 
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: { xs: 2, md: 4 }
+      }}>
+      {/* Logo Section */}
+      <Grid size={{ xs: 12, md: 6 }} sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        padding: { xs: 2, md: 4 }
+      }}>
+        <Box sx={{ 
+          width: '100%',
+          maxWidth: { xs: '300px', sm: '400px', md: '500px', lg: '600px' },
+          textAlign: 'center'
+        }}>
+          <Logo 
+            backgroundSrc={logoResource.url}
+            aspectRatio="16/9"
+            maxWidth="100%"
+          />
+        </Box>
       </Grid>
-      <Grid item xs={12} lg={12} alignContent="center">
-        <Paper style={{ maxWidth: 600, margin: 'auto', textAlign: 'center' }} >
-          <Typography variant="h6" color="primary" style={{ fontSize: '80px', marginTop: '20px', marginBottom: '20px' }}>
+      
+      {/* Login Components Section */}
+      <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Paper 
+          sx={{ 
+            maxWidth: 600, 
+            width: '100%',
+            textAlign: 'center',
+            padding: { xs: 2, md: 3 }
+          }}>
+          <Typography 
+            variant="h6" 
+            color="primary" 
+            sx={{ 
+              fontSize: { xs: '60px', md: '80px' }, 
+              marginTop: { xs: 2, md: 3 }, 
+              marginBottom: { xs: 2, md: 3 }
+            }}>
             <Icon fontSize='inherit'>security</Icon>
           </Typography>
-          <Typography variant="subtitle1" color="secondary">{loginError || 'Welcome, please sign in below'}</Typography>
+          <Typography 
+            variant="subtitle1" 
+            color="secondary"
+            sx={{ marginBottom: 2 }}>
+            {loginError || 'Welcome, please sign in below'}
+          </Typography>
           {authcomponents}
         </Paper>
       </Grid>
