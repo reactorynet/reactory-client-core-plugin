@@ -49,30 +49,29 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
 
   const navigation = ReactRouter.useNavigate();
 
-  const classes = MaterialStyles.makeStyles((theme) => {
-    return {
-      paper: {
-        maxWidth: "900px",
-        marginLeft: "auto",
-        marginRight: "auto",
-      },
-      form_root: {
-        marginTop: "10px",
-        padding: "24px",
-      },
-      header: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        paddingTop: "5rem",
-        marginTop: "20px",
-      },
-      logo: {
-        paddingBottom: "1rem",
-      },
-    };
-  })();
+  // MUI v6: Use sx prop instead of makeStyles
+  const styles = {
+    paper: {
+      maxWidth: "900px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+    form_root: {
+      marginTop: "10px",
+      padding: "24px",
+    },
+    header: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingTop: "5rem",
+      marginTop: "20px",
+    },
+    logo: {
+      paddingBottom: "1rem",
+    },
+  };
 
 
   /**
@@ -319,9 +318,9 @@ export const PasswordResetForm = (props: Reactory.IReactoryComponentProps) => {
   };
 
   return (
-    <Paper elevation={1} className={classes.paper}>      
+    <Paper elevation={1} sx={styles.paper}>      
       <ReactoryForm
-        className={classes.form_root}
+        sx={styles.form_root}
         formDef={getFormDefinition()}
         validate={onValidate}
         liveValidate={true}

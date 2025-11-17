@@ -19,28 +19,28 @@ const Demographics = (props: any) => {
 
   const { reactory, organisationId, user, membership } = props;
   const { id, memberships = [] } = user
-  const { ReactoryForm, MaterialCore, MaterialStyles, React } = reactory.getComponents([
+  const { ReactoryForm, MaterialCore, React } = reactory.getComponents([
     "react.React",
     "core.ReactoryForm",
-    "material-ui.MaterialCore",
-    "material-ui.MaterialStyles"
+    "material-ui.MaterialCore"
   ]);
-  const { Button, Typography } = MaterialCore
-  const { makeStyles } = MaterialStyles
-  const classes = makeStyles((theme) => {
-    return {
-      button_container: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        paddingBottom: '26px',
-        marginTop: '20px',
-        marginRight: '26px',
-        '& button': {
-          padding: '10px 30px',
-        },
+  const { Button, Typography, useTheme } = MaterialCore
+  
+  // MUI v6: Use theme hook and sx prop instead of makeStyles
+  const theme = useTheme();
+  
+  const styles = {
+    button_container: {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      paddingBottom: '26px',
+      marginTop: '20px',
+      marginRight: '26px',
+      '& button': {
+        padding: '10px 30px',
       },
     }
-  })()
+  }
 
   const [demographicsEnabled, setDemographicState] = React.useState({
     age: false,
@@ -247,7 +247,7 @@ const Demographics = (props: any) => {
         refCallback={(ref: any) => { formRef.current = ref }}
         onSubmit={updateDemographic}
       >
-        <div className={classes.button_container}>
+        <div style={styles.button_container}>
           <Button variant="contained" color="secondary" onClick={() => {
             if (formRef !== null && formRef !== undefined && formRef.current !== null && formRef.current !== undefined) {
               //@ts-ignore

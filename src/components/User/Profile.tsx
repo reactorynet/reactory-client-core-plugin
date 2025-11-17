@@ -33,9 +33,13 @@ updatedAt
 
 const nilf = () => { };
 
-const ProfileStyles = (theme: any) => ({
+/**
+ * Profile component styles using MUI v6 sx prop pattern
+ * These style objects are used with the sx prop on components
+ */
+const profileStyles = {
     PaperDefault: {
-        padding: `10px`,
+        padding: '10px',
     },
     mainContainer: {
         width: '100%',
@@ -43,48 +47,48 @@ const ProfileStyles = (theme: any) => ({
         marginLeft: 'auto',
         marginRight: 'auto',
     },
-    margin: {
-        margin: `${theme.spacing(1)}px`,
-    },
+    margin: (theme: any) => ({
+        margin: theme.spacing(1),
+    }),
     confirmed: {
         color: '#02603B'
     },
-    notConfirmed: {
+    notConfirmed: (theme: any) => ({
         color: theme.palette.primary.dark
-    },
+    }),
     textField: {
         width: '98%'
     },
-    confirmedLabel: {
-        margin: `${theme.spacing(1)}px`,
-        marginLeft: `${theme.spacing(2)}px`,
-    },
+    confirmedLabel: (theme: any) => ({
+        margin: theme.spacing(1),
+        marginLeft: theme.spacing(2),
+    }),
     avatarContainer: {
         width: '100%',
         display: 'flex',
         justifyContent: 'left',
         alignItems: 'center'
     },
-    saveContainer: {
+    saveContainer: (theme: any) => ({
         width: '100%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        marginTop: `${theme.spacing(3)}px`,
-        marginBottom: `${theme.spacing(2)}px`,
-    },
-    assessorsContainerButton: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(2),
+    }),
+    assessorsContainerButton: (theme: any) => ({
         display: 'flex',
         justifyContent: 'center',
-        paddingTop: `${theme.spacing(1)}px`,
-        paddingBottom: `${theme.spacing(1)}px`
-    },
-    assessorsContainerBtnLeft: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1)
+    }),
+    assessorsContainerBtnLeft: (theme: any) => ({
         display: 'flex',
         justifyContent: 'left',
-        paddingTop: `${theme.spacing(1)}px`,
-        paddingBottom: `${theme.spacing(1)}px`
-    },
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1)
+    }),
     uploadButton: {
         marginLeft: "12px"
     },
@@ -95,32 +99,31 @@ const ProfileStyles = (theme: any) => ({
         width: 80,
         height: 80,
     },
-    general: {
-        padding: `${theme.spacing(3)}px`,
-    },
+    general: (theme: any) => ({
+        padding: theme.spacing(3),
+    }),
     hiddenInput: {
         display: 'none'
     },
-    peerToolHeader: {
-        paddingTop: `${theme.spacing(2)}px`,
-        paddingBottom: `${theme.spacing(2)}px`,
-    },
-    profileTopMargin: {
-        paddingTop: `${theme.spacing(4)}px`,
-    },
-    sectionHeaderText: {
-        //textTransform: "uppercase",
-        paddingTop: `${theme.spacing(3)}px`,
-        paddingBottom: `${theme.spacing(2)}px`,
-        paddingLeft: `${theme.spacing(1)}px`,
-        paddingRight: `${theme.spacing(1)}px`,
+    peerToolHeader: (theme: any) => ({
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
+    }),
+    profileTopMargin: (theme: any) => ({
+        paddingTop: theme.spacing(4),
+    }),
+    sectionHeaderText: (theme: any) => ({
+        paddingTop: theme.spacing(3),
+        paddingBottom: theme.spacing(2),
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
         color: "#566779",
         fontWeight: 600,
-    },
-    activeOrganisation: {
+    }),
+    activeOrganisation: (theme: any) => ({
         backgroundColor: theme.palette.primary.main,
-    },
-});
+    }),
+};
 
 export interface IProfileProps extends Reactory.IReactoryComponentProps {
     profile: Reactory.Models.IUser,
@@ -227,8 +230,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const [page, setPage] = React.useState<number>(1);
     const [emailValid, setEmailValid] = React.useState<boolean>(reactory.utils.isEmail(props.profile?.email ? props.profile?.email : ""))
     const [findPeersResult, setFindPeersResult] = React.useState<any[]>([]);
-    const [display_add_membership, setDisplayAddMembership] = React.useState<boolean>(false);
-    const [display_role_editor, setDisplayRoleEditor] = React.useState<boolean>(false);
+    const [addMembershipDialogIsVisible, setDisplayAddMembership] = React.useState<boolean>(false);
+    const [roleEditorDialogIsVisible, setDisplayRoleEditor] = React.useState<boolean>(false);
     const [searching, setIsSearching] = React.useState<boolean>(false);
     const [showResult, setShowResult] = React.useState<boolean>(false);
     const [showConfirmDeleteUser, setShowConfirmDeleteUser] = React.useState<boolean>(false);
@@ -258,7 +261,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
     const {
         MaterialCore,
-        MaterialStyles
+        
     } = Material;
 
     const {
@@ -284,10 +287,18 @@ const Profile = (props: IProfileProps): JSX.Element => {
         TableCell,
         TableBody,
         TableRow,
-        Typography
+        Typography,
+        useTheme
     } = MaterialCore;
 
-    const classes = MaterialStyles.makeStyles(ProfileStyles)(props);
+    // MUI v6: Use theme hook instead of makeStyles
+    const theme = useTheme();
+    
+    // Helper function to resolve style values that may be functions
+    const getStyle = (styleKey: keyof typeof profileStyles) => {
+        const style = profileStyles[styleKey];
+        return typeof style === 'function' ? style(theme) : style;
+    };
 
     const onAvatarMouseOver = () => {
         setAvatarMouseOver(true)
@@ -453,7 +464,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         return (
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography variant="h6" color="primary">Memberships</Typography>
-                <Paper className={classes.PaperDefault}>
+                <Paper sx={getStyle('PaperDefault')}>
                     <StaticContent
                         slug={"core-user-profile-memebership-intro"}
                         editRoles={["DEVELOPER", "ADMIN"]}
@@ -489,7 +500,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
                             return (
                                 <ListItem key={index}
-                                    className={activeOrganizationId === id ? classes.activeOrganisation : ""}>
+                                    sx={activeOrganizationId === id ? getStyle('activeOrganisation') : {}}>
                                     <ListItemAvatar>
                                         <Avatar style={{ marginRight: `8px` }}>
                                             {membership &&
@@ -527,7 +538,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                     </MaterialCore.List>
                     {selectedMembership !== null && <AlertDialog
                         title={`Update membership for ${selectedMembership && selectedMembership.organization ? selectedMembership.organization.name : `${t(selectedMembership.client.name)} - APPLICATION MEMBERSHIP`}`}
-                        open={display_role_editor === true && selectedMembership}
+                        open={roleEditorDialogIsVisible === true && selectedMembership}
                         showCancel={false}
                         acceptTitle={'DONE'}
                         onAccept={() => {
@@ -598,7 +609,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                         </Grid>
                     </AlertDialog>}
                     {
-                        display_add_membership === true &&
+                        addMembershipDialogIsVisible === true &&
                         <AlertDialog
                             open={true}
                             title={`Add new membership for ${profile.firstName} ${profile.lastName}`}
@@ -648,8 +659,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
         const displayDemographics = props.profie && selectedMembership && activeOrganizationId
         const userDemographic = (
             <Grid item sm={12} xs={12} >
-                <Typography className={classes.sectionHeaderText} variant="h6" color="primary">Demographics</Typography>
-                <Paper className={classes.PaperDefault}>
+                <Typography sx={getStyle('sectionHeaderText')} variant="h6" color="primary">Demographics</Typography>
+                <Paper sx={getStyle('PaperDefault')}>
                     {displayDemographics ? <UserDemographics 
                         user={props.profile}
                         membership={selectedMembership}
@@ -860,9 +871,9 @@ const Profile = (props: IProfileProps): JSX.Element => {
                             <div>
                                 <>TOOLBAR NEEDED</>
                                 <hr />
-                                <Typography className={peers.confirmedAt ?
-                                    reactory.utils.classNames([classes.confirmedLabel, classes.notConfirmed]) :
-                                    reactory.utils.classNames([classes.confirmedLabel, classes.confirmed])}
+                                <Typography sx={peers.confirmedAt ?
+                                    { ...getStyle('confirmedLabel'), ...getStyle('notConfirmed') } :
+                                    { ...getStyle('confirmedLabel'), ...getStyle('confirmed') }}
                                     variant={"body1"}>{reactory.utils.moment(peers.confirmedAt).isValid() === true ? `Last Confirmed: ${reactory.utils.moment(peers.confirmedAt).format('YYYY-MM-DD')} (Year Month Day)` : 'Once completed, please confirm your assessors'}</Typography>
                             </div>
                         )
@@ -961,9 +972,9 @@ const Profile = (props: IProfileProps): JSX.Element => {
                         Your assessors will only be notified of their nomination a maximum of once every 30 days.
                     </Typography>
                     <hr />
-                    <Typography className={peers.confirmedAt ?
-                        reactory.utils.classNames([classes.confirmedLabel, classes.notConfirmed]) :
-                        reactory.utils.classNames([classes.confirmedLabel, classes.confirmed])}
+                    <Typography sx={peers.confirmedAt ?
+                        { ...getStyle('confirmedLabel'), ...getStyle('notConfirmed') } :
+                        { ...getStyle('confirmedLabel'), ...getStyle('confirmed') }}
                         variant={"body1"}>
                         {reactory.utils.moment(peers.confirmedAt).isValid() === true ? `Last Confirmed: ${reactory.utils.moment(peers.confirmedAt).format('YYYY-MM-DD')} (Year Month Day)` : 'Once completed, please confirm your assessors'}
                     </Typography>
@@ -979,15 +990,15 @@ const Profile = (props: IProfileProps): JSX.Element => {
             const { theme } = props;
 
             materialTable = (
-                <Paper className={classes.general}>
+                <Paper sx={getStyle('general')}>
                     {/* <Typography variant="h6">My assessors - {this.state.selectedMembership.organization.name}</Typography> */}
                     <Toolbar>
                         <Grid container spacing={2}>
                             <Grid container item direction="row">
-                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className={classes.assessorsContainerButton} style={{ display: data && Object.keys(data).length > 0 ? 'none' : 'flex' }}>
+                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ ...getStyle('assessorsContainerButton'), display: data && Object.keys(data).length > 0 ? 'none' : 'flex' }}>
                                     <Typography variant="body2" color={'primary'}>You do not yet have any assessors. Assessors are the employees of your organisation who will be completing surveys for you.</Typography>
                                 </Grid>
-                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} className={data && Object.keys(data).length > 0 ? classes.assessorsContainerBtnLeft : classes.assessorsContainerButton}>
+                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={data && Object.keys(data).length > 0 ? getStyle('assessorsContainerBtnLeft') : getStyle('assessorsContainerButton')}>
                                     <Tooltip title="Click here to add new assessors">
                                         <Button color="secondary" variant="contained" component="span" onClick={editUserSelection} style={{ marginRight: '12px' }}><Icon>add</Icon>ADD ASSESSORS</Button>
                                     </Tooltip>
@@ -1246,7 +1257,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 {addUserDialog}
                 {
                     !membershipSelected &&
-                    <Paper className={classes.PaperDefault}>
+                    <Paper sx={getStyle('PaperDefault')}>
                         <Typography variant="body2">Select a membership with an organization organization to load assessors</Typography>
                     </Paper>
                 }
@@ -1342,24 +1353,24 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         let avatarComponent = null;
         avatarComponent = (
-            <div className={classes.avatarContainer}>
+            <div style={getStyle('avatarContainer')}>
                 <Tooltip title={`Click on the UPLOAD PHOTO button to change your profile picture`}>
                     <Avatar
                         src={avatarUpdated === false ? reactory.getAvatar(profile, null) : profile.avatar} alt={`${firstName} ${lastName} `}
-                        className={reactory.utils.classNames(classes.avatar, classes.bigAvatar, avatarMouseOver === true ? classes.avatarHover : '')}
+                        sx={{ ...getStyle('avatar'), ...getStyle('bigAvatar'), ...(avatarMouseOver === true ? { cursor: 'pointer', opacity: 0.8 } : {}) }}
                         onMouseOver={onAvatarMouseOver}
                         onMouseOut={onAvatarMouseOut} />
                 </Tooltip>
 
                 <input accept="image/png"
-                    className={classes.hiddenInput}
+                    style={getStyle('hiddenInput')}
                     onChange={onFileClick}
                     id="icon-button-file"
                     type="file"
                     ref={(inputRef) => userProfileImageFile.current = inputRef} />
                 <label htmlFor="icon-button-file">
                     <Tooltip title={`Select a png image that is less than 350kb in size.`}>
-                        <Button color="primary" variant="outlined" component="span" className={classes.uploadButton}>Upload Photo</Button>
+                        <Button color="primary" variant="outlined" component="span" sx={getStyle('uploadButton')}>Upload Photo</Button>
                     </Tooltip>
                 </label>
             </div>);
@@ -1372,7 +1383,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 <Grid item sm={12} xs={12} alignItems={'flex-start'} display={'flex'} flexDirection={'row'}>
                     <GoBack /><Typography variant='h6' color="primary">{firstName} {lastName}</Typography>
                 </Grid>
-                <Paper className={classes.PaperDefault}>
+                <Paper sx={getStyle('PaperDefault')}>
                     <Grid container spacing={4}>
                         {withAvatar === true && <Grid item sm={12} xs={12}>
                             {avatarComponent}
@@ -1575,7 +1586,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
     if (nocontainer === false) {
         return (
-            <div {...containerProps} className={classes.profileTopMargin}>
+            <div {...containerProps} style={getStyle('profileTopMargin')}>
                 {ProfileInGrid}
             </div>
         );

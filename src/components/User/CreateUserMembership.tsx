@@ -41,7 +41,7 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
   const [passwordUpdated, setIsPasswordUpdated] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState({
-    user: reactory.getUser(),
+    user: reactory.getUser().loggedIn ? reactory.getUser() : null,
     password: '',
     passwordConfirm: '',
     authToken: localStorage.getItem('auth_token')
@@ -49,21 +49,18 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
 
   const [organisation, setOrganisations] = useState<Organisation[]>([]);
 
-  
-
-  const classes = MaterialStyles.makeStyles((theme) => {
-    return {
-      paper: {
-        maxWidth: '900px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-      },
-      form_root: {
-        marginTop: '10px',
-        padding: '24px',
-      },
-    };
-  })();
+  // MUI v6: Use sx prop instead of makeStyles
+  const styles = {
+    paper: {
+      maxWidth: '900px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+    },
+    form_root: {
+      marginTop: '10px',
+      padding: '24px',
+    },
+  };
 
   const ReactoryRoleSelector = ({ formData = [], onChange }) => {
 
@@ -205,7 +202,7 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
       name: 'CreateUserMembership',
       nameSpace: 'forms',
       version: '1.0.0',
-      backButton: false,
+      backButton: false,      
       helpTopics: ['create-new-user-role'],
       roles: ['ADMIN'],
       widgetMap: [{
@@ -213,8 +210,6 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
         widget: 'ReactoryRoleSelector'
       }],
       schema: {
-        title: 'Create New Membership',
-        description: '',
         type: 'object',
         required: [
           'roles',
@@ -239,23 +234,19 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
       },
       uiSchema: {
         "ui:form": {
-          submitProps: {
-            variant: 'contained',
-            iconAlign: 'right',
-            title: reactory.i18n.t("reactory.forms.create_membership.submit_title", "ADD MEMBERSHIP"),
-          },
-          submitIcon: 'shield_person',          
+          showSubmit: false,
+          showRefresh: false,          
         },
         organization: {
           'ui:widget': 'SelectWithDataWidget',
           'ui:options': {
-            multiSelect: false,
+            multiSelect: false,            
             query: MyOrganisationMemberships,
             resultItem: 'CoreOrganizations',
             resultsMap: {
               'CoreOrganizations.[].id': ['[].key', '[].value'],
               'CoreOrganizations.[].name': '[].label',
-            },
+            },            
           },
         },
         businessUnit: {
@@ -298,19 +289,14 @@ export const CreateUserMembership = (props: CreateUserMembershipProps) => {
     return errors;
   }
 
-  return (
-    <Paper elevation={1} className={classes.paper}>
-      {/* YOUR COMPONENTS HERE */}
-      <ReactoryForm
-        className={classes.form_root}
-        formDef={getFormDefinition()}
-        validate={onValidate}
-        liveValidate={true}
-        onSubmit={onSubmit}
-        formData={formData} />
-    </Paper>
+  return (     
+    <ReactoryForm        
+      formDef={getFormDefinition()}
+      validate={onValidate}
+      liveValidate={true}
+      onSubmit={onSubmit}
+      formData={formData} />
   )
-
 };
 
 const ReactoryCreateUserMembershipRegistryEntry: Reactory.Client.IReactoryComponentRegistryEntry<typeof CreateUserMembership> = {

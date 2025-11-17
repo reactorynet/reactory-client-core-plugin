@@ -40,7 +40,6 @@ export const UserListWithSearch = (props: UserListWithSearchProps) => {
   const {
     MaterialCore,
     MaterialIcons,
-    MaterialStyles,
   } = Material;
 
   const {
@@ -52,7 +51,8 @@ export const UserListWithSearch = (props: UserListWithSearchProps) => {
     InputBase,
     Toolbar,
     Typography,
-    Tooltip
+    Tooltip,
+    alpha
   } = MaterialCore;
 
   const {
@@ -78,125 +78,122 @@ export const UserListWithSearch = (props: UserListWithSearchProps) => {
     refreshEvents = []
   } = props;
 
-  const { makeStyles } = MaterialStyles;
+  // MUI v6: Use theme hook and sx prop instead of makeStyles
+  const theme = MaterialCore.useTheme();
+  
+  const styles = {
+    mainContainer: {
+      padding: '5px',
+      height: '100%',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      backgroundColor: '#F3F2F1',
+      overflow: 'hidden'
+    },
+    columnContainer: {
+      width: '100%',
+      overflowX: 'scroll',
+      maxHeight: (window.innerHeight - 140),
+      padding: theme.spacing(1),
+      display: 'flex',
+      justifyContent: 'center',
+      minWidth: 250 * 5
+    },
+    general: {
+      padding: '5px'
+    },
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+    selectEmpty: {
+      marginTop: theme.spacing(2),
+    },
+    buttonRow: {
+      display: 'flex',
+      justifyContent: 'flex-end'
+    },
+    userList: {
+      maxHeight: (window.innerHeight - 140) / 2,
+      overflow: 'scroll'
+    },
+    taskList: {
 
-  const Styles = makeStyles((theme) => {
-    return {
-      mainContainer: {
-        padding: '5px',
-        height: '100%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        backgroundColor: '#F3F2F1',
-        overflow: 'hidden'
+    },
+    column: {
+      maxHeight: (window.innerHeight - 140),
+      overflowY: 'scroll',
+      padding: theme.spacing(1),
+      margin: theme.spacing(2),
+      minWidth: '250px',
+      maxWidth: '350px',
+      width: (window.innerWidth / 5)
+    },
+    toolbar: {
+      marginBottom: theme.spacing(2)
+    },
+    menuButton: {
+      marginLeft: -12,
+      marginRight: 20,
+    },
+    title: {
+      display: 'none',
+      [theme.breakpoints.up('sm')]: {
+        display: 'block',
       },
-      columnContainer: {
-        width: '100%',
-        overflowX: 'scroll',
-        maxHeight: (window.innerHeight - 140),
-        padding: theme.spacing(1),
+    },
+    search: {
+      position: 'relative',
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: alpha(theme.palette.common.white, 0.15),
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
+      },
+      marginRight: theme.spacing(2),
+      marginLeft: 0,
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(3),
+        width: 'auto',
+      },
+    },
+    searchIcon: {
+      width: theme.spacing(9),
+      height: '100%',
+      position: 'absolute',
+      pointerEvents: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    inputRoot: {
+      color: 'inherit',
+      width: '100%',
+    },
+    inputInput: {
+      paddingTop: theme.spacing(1),
+      paddingRight: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+      paddingLeft: theme.spacing(10),
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        width: 200,
+      },
+    },
+    sectionDesktop: {
+      display: 'none',
+      [theme.breakpoints.up('md')]: {
         display: 'flex',
-        justifyContent: 'center',
-        minWidth: 250 * 5
       },
-      general: {
-        padding: '5px'
-      },
-      formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-      },
-      selectEmpty: {
-        marginTop: theme.spacing(2),
-      },
-      buttonRow: {
-        display: 'flex',
-        justifyContent: 'flex-end'
-      },
-      userList: {
-        maxHeight: (window.innerHeight - 140) / 2,
-        overflow: 'scroll'
-      },
-      taskList: {
-
-      },
-      column: {
-        maxHeight: (window.innerHeight - 140),
-        overflowY: 'scroll',
-        padding: theme.spacing(1),
-        margin: theme.spacing(2),
-        minWidth: '250px',
-        maxWidth: '350px',
-        width: (window.innerWidth / 5)
-      },
-      toolbar: {
-        marginBottom: theme.spacing(2)
-      },
-      menuButton: {
-        marginLeft: -12,
-        marginRight: 20,
-      },
-      title: {
+    },
+    sectionMobile: {
+      display: 'flex',
+      [theme.breakpoints.up('md')]: {
         display: 'none',
-        [theme.breakpoints.up('sm')]: {
-          display: 'block',
-        },
       },
-      search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-          backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(2),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-          marginLeft: theme.spacing(3),
-          width: 'auto',
-        },
-      },
-      searchIcon: {
-        width: theme.spacing(9),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      inputRoot: {
-        color: 'inherit',
-        width: '100%',
-      },
-      inputInput: {
-        paddingTop: theme.spacing(1),
-        paddingRight: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        paddingLeft: theme.spacing(10),
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-          width: 200,
-        },
-      },
-      sectionDesktop: {
-        display: 'none',
-        [theme.breakpoints.up('md')]: {
-          display: 'flex',
-        },
-      },
-      sectionMobile: {
-        display: 'flex',
-        [theme.breakpoints.up('md')]: {
-          display: 'none',
-        },
-      }
-    };
-  });
-
-  const classes = Styles();
+    }
+  };
 
   const { useState, useEffect } = React;
 
@@ -265,24 +262,24 @@ export const UserListWithSearch = (props: UserListWithSearchProps) => {
 
   return (
     <>
-      <AppBar position="sticky" color="default" className={classes.toolbar}>
+      <AppBar position="sticky" color="default" sx={styles.toolbar}>
         <Toolbar>
           <Typography variant="h6" color="inherit">Employees</Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
+          <MaterialCore.Box sx={styles.search}>
+            <MaterialCore.Box sx={styles.searchIcon}>
               <Icon><Search /></Icon>
-            </div>
+            </MaterialCore.Box>
             <InputBase
               placeholder="Search…"
               value={inputText}
               onChange={onSearchStringChanged}
               onKeyPress={onSearchStringOnKeyPress}
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
+              sx={{
+                ...styles.inputRoot,
+                '& input': styles.inputInput,
               }}
             />
-          </div>
+          </MaterialCore.Box>
           <Tooltip title={`Click to refresh after changing your search options`}>
             <IconButton color="primary" onClick={doRefresh}>
               <Badge badgeContent={skip ? '!' : ''} hidden={skip === false} color="secondary">
