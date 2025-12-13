@@ -88,8 +88,8 @@ interface SchemaConfig extends Reactory.Forms.IReactoryFormSchemas {
 ```
 
 **Features:**
-- **JSON Schema Editor**: Monaco-based editor with syntax highlighting
-- **Schema Validation**: Real-time JSON schema validation
+- **JSON Schema Editor**: ✅ **SELECTED** - Existing JsonSchemaEditor (QuillJS-based) with syntax highlighting
+- **Schema Validation**: Real-time JSON schema validation with error feedback
 - **AI Schema Generation**: Generate schemas from natural language descriptions
 - **Schema Templates**: Pre-built schema templates for common use cases
 - **Field Wizard**: Visual field addition with type selection
