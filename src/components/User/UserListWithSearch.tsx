@@ -344,15 +344,14 @@ export const UserListWithSearch = (props: UserListWithSearchProps) => {
   )
 };
 
-const UserListWithSearchRegistration: Reactory.Forms.IReactoryComponentRegistryEntry = {
+const UserListWithSearchRegistration: Reactory.IReactoryComponentDefinition<typeof UserListWithSearch> = {
   nameSpace: "core",
   name: "UserList",
   component: UserListWithSearch,
   version: "1.0.0",
   roles: ["USER"],
   tags: [],
-  componentType: "component",
-  connectors: []
+  description: "A component that displays a list of users with a search bar and filters"  
 };
 
 export default UserListWithSearchRegistration;

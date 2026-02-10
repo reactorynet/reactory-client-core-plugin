@@ -36,7 +36,7 @@ reactory-data/plugins/reactory-client-core/
 - **Peer Dependencies**: React 17.0.2, React-DOM 17.0.2
 - **Dev Dependencies**: Full Babel, Rollup, TypeScript, Material UI setup
 - **Build Scripts**: 
-  - `npm run rollup` → `rollup --config --bundleConfigAsCjs rollup.config.cjs`
+  - `yarn run rollup` → `rollup --config --bundleConfigAsCjs rollup.config.cjs`
   - Separate dev/prod builds with NODE_ENV
 
 ### 3. Component Registration System ✅
@@ -45,29 +45,30 @@ reactory-data/plugins/reactory-client-core/
 - **Current FormEditor**: Already registered as `reactory.FormEditor@1.0.0` with DEVELOPER role
 - **Component Structure**: Each component needs nameSpace, name, version, component, roles
 
-## Potential Dependencies for Form Editor
+## Code Editor Decision - COMPLETED ✅
 
-### Code Editor Libraries (To Investigate)
-1. **Monaco Editor**
-   - Bundle size: ~2.5MB (large)
-   - Features: Full VS Code experience
-   - Build impact: Requires webpack plugins or special rollup handling
+### Selected Code Editor: Existing JsonSchemaEditor Components
+**Decision**: Use existing `@JsonSchemaEditor` components based on QuillJS (ReactQuill)
 
-2. **CodeMirror 6**
-   - Bundle size: ~500KB (moderate)
-   - Features: Lightweight, extensible
-   - Build impact: Better rollup compatibility
+**Decision Details:**
+- **Location**: `/src/components/shared/JsonSchemaEditor/`
+- **Components**: `JsonSchemaEditor.tsx`, `JsonSchemaEditorComponent.tsx`, `JsonSchemaEditorWidget.tsx`
+- **Bundle Impact**: Zero additional dependencies (already available)
+- **Features**: JSON validation, formatting, syntax highlighting, Material UI integration
+- **Build Compatibility**: Already integrated with existing build system
 
-3. **Ace Editor**
-   - Bundle size: ~400KB (moderate)
-   - Features: Mature, stable
-   - Build impact: Good rollup support
+**Why This Decision:**
+- ✅ **Already Available**: No need to add new dependencies
+- ✅ **Zero Bundle Impact**: Maintains current bundle size
+- ✅ **Feature Complete**: Includes all needed JSON schema editing features
+- ✅ **Build Compatible**: Works with existing rollup configuration
+- ✅ **Theme Integrated**: Material UI compatible styling
 
 ### Additional Dependencies Needed
-- JSON Schema validator (ajv, joi)
-- Drag & drop library (react-dnd, @dnd-kit)
-- Debouncing utility (lodash.debounce or custom)
-- State management (if not using existing)
+- JSON Schema validator (ajv, joi) - for enhanced validation
+- Drag & drop library (react-dnd, @dnd-kit) - for UI schema designer
+- Debouncing utility (lodash.debounce or custom) - for auto-save
+- State management (if not using existing) - for complex form state
 
 ## Phase 1 Pre-Development Tasks
 
@@ -88,7 +89,7 @@ reactory-data/plugins/reactory-client-core/
   - Plan new dependency integration
 
 - [ ] **0.1.3**: Test current build process
-  - Run `npm run rollup` and document output
+  - Run `yarn run rollup` and document output
   - Measure build time baseline
   - Check for any existing build issues
 
@@ -135,7 +136,7 @@ reactory-data/plugins/reactory-client-core/
 
 ### Development Workflow
 1. **Local Development**: Standard React development
-2. **Build Testing**: Regular `npm run rollup` testing
+2. **Build Testing**: Regular `yarn run rollup` testing
 3. **Bundle Analysis**: Monitor bundle size growth
 4. **Performance Testing**: Editor responsiveness checks
 

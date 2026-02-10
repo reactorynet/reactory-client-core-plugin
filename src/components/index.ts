@@ -11,18 +11,4 @@ export const components = [
     ...TemplateEditors,
     ...UserComponents,
     ...AuthenticationComponents,
-    {
-        nameSpace: 'reactory',
-        name: 'FormEditor',
-        version: '1.0.0',
-        component: FormEditor,
-        roles: ['DEVELOPER'],
-    },
-    {
-        nameSpace: 'reactory',
-        name: 'FormEditorEnhanced',
-        version: '1.0.0',
-        component: FormEditorEnhanced,
-        roles: ['DEVELOPER'],
-    }    
 ];
