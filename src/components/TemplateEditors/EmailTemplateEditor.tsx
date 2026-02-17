@@ -1,6 +1,6 @@
 import { nameSpace } from '../../constants';
-import Reactory from '@reactory/reactory-core'
-import { IReactoryComponentProps } from '@reactory/reactory-core/src/types';
+import Reactory from '@reactorynet/reactory-core'
+import { IReactoryComponentProps } from '@reactorynet/reactory-core/src/types';
 const dependencies = [
   'material-ui.Material',
   'core.ReactoryForm',

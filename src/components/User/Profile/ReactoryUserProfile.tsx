@@ -1,4 +1,4 @@
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 import { ReactoryClientCore } from 'types';
 import useProfileHook, { DEFAULT_PROFILE_COMPONENTS } from '../hooks/useProfile';
 

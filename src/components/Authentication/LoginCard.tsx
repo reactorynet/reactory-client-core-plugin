@@ -1,4 +1,4 @@
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 
 interface LoginDependencies {
   Logo: (props: any, context: any) => JSX.Element;

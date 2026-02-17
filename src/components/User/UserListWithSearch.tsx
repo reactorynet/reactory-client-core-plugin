@@ -1,4 +1,4 @@
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 
 type USER_FILTER = string | "search" | "business_unit" | "team" | "demographics";
 type USERLIST_VIEWMODE = string | "list" | "grid" | "cards";

@@ -31,7 +31,7 @@ reactory-data/plugins/reactory-client-core/
 
 ### 2. Package.json Dependencies ✅
 - **Current Dependencies**: 
-  - @reactory/reactory-core (local file)
+  - @reactorynet/reactory-core (local file)
   - core-js, styled-jsx
 - **Peer Dependencies**: React 17.0.2, React-DOM 17.0.2
 - **Dev Dependencies**: Full Babel, Rollup, TypeScript, Material UI setup

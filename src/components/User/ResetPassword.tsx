@@ -4,7 +4,7 @@
  * password reset form. The form is a schema generated
  * form, with a custom widget injected at runtime.
  */
-import Reactory from '@reactory/reactory-core'
+import Reactory from '@reactorynet/reactory-core'
 
 type PasswordResetFormDeps = {
   React: Reactory.React,
