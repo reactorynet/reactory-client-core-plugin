@@ -1,4 +1,4 @@
-import Reactory from "@reactory/reactory-core";
+import Reactory from "@reactorynet/reactory-core";
 const paging: Reactory.Data.PagingRequest = {
   page: 1,
   pageSize: 100,

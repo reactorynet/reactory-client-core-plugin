@@ -1,4 +1,4 @@
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 import { SyntheticEvent } from 'react';
 // import {
 //   AppBar,
@@ -19,7 +19,7 @@ import { SyntheticEvent } from 'react';
 // import { withTheme, withStyles, makeStyles } from '@mui/styles';
 // import { useReactory, withReactory } from '@reactory/client-core/api/ApiProvider';
 // import styles from '@reactory/client-core/components/shared/styles';
-// import Reactory from '@reactory/reactory-core';
+// import Reactory from '@reactorynet/reactory-core';
 // import ReactoryApi from '@reactory/client-core/api/ApiProvider';
 
 type USER_FILTER = string | "search" | "business_unit" | "team" | "demographics";

@@ -1,4 +1,4 @@
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 
 export interface ReactoryMembershipRolesProps {
   membership: Reactory.Models.IMembership,
