@@ -1,5 +1,5 @@
 import React from 'react';
-import Reactory from '@reactory/reactory-core';
+import Reactory from '@reactorynet/reactory-core';
 import { ReactoryClientCore } from 'types';
 
 const ReactoryUserProfileGeneral = (props: ReactoryClientCore.Components.ReactoryUserProfileGenericProperties) => {

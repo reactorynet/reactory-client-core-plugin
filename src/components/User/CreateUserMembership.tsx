@@ -1,5 +1,5 @@
 import ReactAlias from 'react';
-import Reactory from "@reactory/reactory-core";
+import Reactory from "@reactorynet/reactory-core";
 
 type CreateUserMembershipProps = {
   reactory: Reactory.Client.IReactoryApi;
