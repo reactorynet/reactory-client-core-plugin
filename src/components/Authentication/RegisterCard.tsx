@@ -362,7 +362,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
               <Logo
                 backgroundSrc={logoResource.url}
                 aspectRatio="16/9"
-                maxWidth="140px"
+                maxWidth="320px"
               />
             </Box>
 
