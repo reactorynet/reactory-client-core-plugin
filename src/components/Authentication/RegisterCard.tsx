@@ -15,10 +15,13 @@ interface FieldErrors {
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
+  username?: string | null;
   password?: string | null;
   passwordConfirm?: string | null;
   organizationName?: string | null;
 }
+
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken';
 
 /**
  * Computes a simple password strength score (0-4) for visual feedback.
@@ -104,6 +107,10 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
   const [touched, setTouched] = React.useState<Record<string, boolean>>({});
   const [activeStep, setActiveStep] = React.useState<number>(0);
   const [mounted, setMounted] = React.useState<boolean>(false);
+  const [username, setUsername] = React.useState<string>('');
+  const [usernameStatus, setUsernameStatus] = React.useState<UsernameStatus>('idle');
+  const [usernameSuggestion, setUsernameSuggestion] = React.useState<string | null>(null);
+  const usernameDebounce = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 100);
@@ -125,6 +132,42 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
   }, [organizationId]);
 
   const { nilStr, isEmail, isValidPassword } = reactory.utils;
+
+  // Debounced username availability check
+  React.useEffect(() => {
+    if (usernameDebounce.current) clearTimeout(usernameDebounce.current);
+    const trimmed = username.trim();
+    if (!trimmed || trimmed.length < 3) {
+      setUsernameStatus('idle');
+      setUsernameSuggestion(null);
+      return;
+    }
+    // Validate format before checking server
+    if (!/^[a-z0-9_]{3,50}$/i.test(trimmed)) {
+      setUsernameStatus('idle');
+      return;
+    }
+    setUsernameStatus('checking');
+    setUsernameSuggestion(null);
+    usernameDebounce.current = setTimeout(() => {
+      (reactory as any).checkUsername(trimmed)
+        .then((result: any) => {
+          if (result?.exists) {
+            setUsernameStatus('taken');
+            setUsernameSuggestion(result.suggestion || null);
+          } else {
+            setUsernameStatus('available');
+            setUsernameSuggestion(null);
+          }
+        })
+        .catch(() => {
+          setUsernameStatus('idle');
+        });
+    }, 500);
+    return () => {
+      if (usernameDebounce.current) clearTimeout(usernameDebounce.current);
+    };
+  }, [username]);
 
   // -- Field Validation --
   const validate = (): { valid: boolean; errors: FieldErrors } => {
@@ -194,11 +237,11 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
     setRegisterError(null);
 
     const payload = {
-      user: { email, password, firstName, lastName },
+      user: { email, password, firstName, lastName, username: username.trim() || undefined },
       organization: { id: organizationId, name: organizationName },
     };
 
-    reactory
+    (reactory as any)
       .register(payload)
       .then(() => {
         // Auto-login after successful registration
@@ -241,7 +284,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
 
   let logoResource = reactory.getTheme().assets?.find((e) => e.name === 'logo');
   if (!logoResource || !logoResource.url) {
-    logoResource = { name: 'logo', url: 'https://placehold.it/200x200' };
+    logoResource = { name: 'logo', url: 'https://placehold.it/200x200', assetType: 'image' } as any;
   }
 
   const steps = [
@@ -259,13 +302,8 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
           alignItems: 'center',
           justifyContent: 'center',
           background: (theme) =>
-            `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 50%, ${theme.palette.secondary.main} 100%)`,          backgroundSize: '200% 200%',
-          animation: 'gradientShift 8s ease infinite',
-          '@keyframes gradientShift': {
-            '0%': { backgroundPosition: '0% 50%' },
-            '50%': { backgroundPosition: '100% 50%' },
-            '100%': { backgroundPosition: '0% 50%' },
-          },          backgroundSize: '200% 200%',
+            `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 50%, ${theme.palette.secondary.main} 100%)`,
+          backgroundSize: '200% 200%',
           animation: 'gradientShift 8s ease infinite',
           '@keyframes gradientShift': {
             '0%': { backgroundPosition: '0% 50%' },
@@ -507,6 +545,84 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                     }}
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
+
+                  {/* Username field */}
+                  <TextField
+                    label={reactory.i18n.t(
+                      'reactory:register.username_label',
+                      'Preferred Username (optional)',
+                    )}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    onBlur={() => markTouched('username')}
+                    onKeyDown={handleKeyDown}
+                    disabled={busy}
+                    fullWidth
+                    variant="outlined"
+                    autoComplete="username"
+                    inputProps={{ maxLength: 50 }}
+                    error={usernameStatus === 'taken'}
+                    helperText={
+                      usernameStatus === 'checking'
+                        ? reactory.i18n.t('reactory:register.username_checking', 'Checking availability\u2026')
+                        : usernameStatus === 'available'
+                        ? reactory.i18n.t('reactory:register.username_available', 'Username is available')
+                        : usernameStatus === 'taken'
+                        ? reactory.i18n.t('reactory:register.username_taken', 'Username is already taken')
+                        : reactory.i18n.t(
+                            'reactory:register.username_hint',
+                            'Leave blank to use your email address. Letters, numbers and underscores only.',
+                          )
+                    }
+                    FormHelperTextProps={{
+                      sx: {
+                        color:
+                          usernameStatus === 'available'
+                            ? 'success.main'
+                            : usernameStatus === 'taken'
+                            ? 'error.main'
+                            : 'text.secondary',
+                      },
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Icon sx={{ color: 'text.secondary' }}>alternate_email</Icon>
+                        </InputAdornment>
+                      ),
+                      endAdornment: usernameStatus === 'checking' ? (
+                        <InputAdornment position="end">
+                          <CircularProgress size={18} />
+                        </InputAdornment>
+                      ) : usernameStatus === 'available' ? (
+                        <InputAdornment position="end">
+                          <Icon sx={{ color: 'success.main' }}>check_circle</Icon>
+                        </InputAdornment>
+                      ) : null,
+                    }}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                  />
+
+                  {/* Suggestion chip when username is taken */}
+                  {usernameStatus === 'taken' && usernameSuggestion && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {reactory.i18n.t('reactory:register.username_suggestion', 'Try:')}
+                      </Typography>
+                      <Chip
+                        label={usernameSuggestion}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        icon={<Icon style={{ fontSize: 14 }}>auto_fix_high</Icon>}
+                        onClick={() => {
+                          setUsername(usernameSuggestion);
+                          setUsernameSuggestion(null);
+                        }}
+                        sx={{ cursor: 'pointer', fontFamily: 'monospace' }}
+                      />
+                    </Box>
+                  )}
 
                   <Button
                     variant="contained"
