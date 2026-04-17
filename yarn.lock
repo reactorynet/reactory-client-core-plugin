@@ -2125,10 +2125,10 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@reactorynet/reactory-core@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@reactorynet/reactory-core/-/reactory-core-1.1.4.tgz#295fd177adc10eaf50ae163f6f9dd3451e74b4f0"
-  integrity sha512-BtrrhXjKdal9eFYsDLbLsubJmawhQMv7uWI7DMzZdwN7OmdhxLrjo+zYmDLqN897XRcts5cgIBv4W9PRumJMvw==
+"@reactorynet/reactory-core@1.1.9":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@reactorynet/reactory-core/-/reactory-core-1.1.9.tgz#8bcaece1b81e2db1b7581b344452317d9f6357fd"
+  integrity sha512-u5ifFaK4be5NDSW6Lwgt6jZfReIC55Kz93XwErjGfJZ2Nap5OKy0KUoIE3tMGWZxxUXmVzoueRq5DDgnSkC5Qw==
   dependencies:
     reflect-annotations "4.0.0-beta.1"
     reflect-args "2.0.0"
