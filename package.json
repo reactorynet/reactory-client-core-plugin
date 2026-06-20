@@ -64,12 +64,12 @@
     "@eslint/config-array": "0.17.0",
     "@eslint/js": "8.56.0",
     "@eslint/object-schema": "2.1.4",
-    "@mui/x-data-grid": "5.17.23",
-    "@mui/x-date-pickers": "^6.19.0",
-    "@mui/material": "^6.5.0",
-    "@mui/system": "^6.5.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/lab": "6.0.0-beta.0",
+    "@mui/material": "^6.5.0",
+    "@mui/system": "^6.5.0",
+    "@mui/x-data-grid": "5.17.23",
+    "@mui/x-date-pickers": "^6.19.0",
     "@rollup/plugin-babel": "6.0.4",
     "@rollup/plugin-commonjs": "25.0.5",
     "@rollup/plugin-node-resolve": "15.2.3",
@@ -108,8 +108,8 @@
     "mongoose": "6.8.3",
     "object-mapper": "6.2.0",
     "react": "17.0.2  ",
-    "react-i18next": "^11.15.3",
     "react-dom": "17.0.2",
+    "react-i18next": "^11.15.3",
     "react-router": "6.3.0",
     "react-router-dom": "6.3.0",
     "rollup": "4.0.2",
@@ -117,5 +117,6 @@
     "shelljs": "0.8.5",
     "ts-node": "10.7.0",
     "typescript": "4.5.5"
-  }
+  },
+  "packageManager": "yarn@4.15.0+sha512.07ec708ac11e2eaa4ea2b04cfbb272812f7e74a753f1595eaef4486c663a98306a30cca3e6fc40f7a0b168dcfb3a2490b6a5e0501e20fb69cc36f563dd161c53"
 }
