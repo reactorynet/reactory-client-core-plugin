@@ -100,7 +100,6 @@ const FroalaWidget = (props) => {
    
   const onEditorInitialized = ($editor, config) => {
     reactory.log(`Froala Editor is Initialized`, { $editor, config }, 'debug');
-    debugger
 
     setEditor($editor);
   };
@@ -199,7 +198,6 @@ const FroalaWidget = (props) => {
     },
     'blur': function () {
       let $editor = this;
-      debugger
       const html = $editor.html.get();
       model.current = html;
       if (props.onChange) {

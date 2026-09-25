@@ -455,7 +455,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
                 reactory.createNotification(data.ReactoryCoreRemoveUserMembership.message, {
                     type: data.success === true ? 'success' : 'warning'
                 });
-                debugger
                 if(refetch) refetch();
                 if(isProfileOwner) await reactory.status()
             }
@@ -728,7 +727,6 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
             reactory.graphqlMutation<any, any>(mutation, variables).then((peerResult) => {
                 //console.log('Set the user peer relationship', peerResult)
-                debugger;
                 if (cb && peerResult.data.setPeerRelationShip) {
                     cb(peerResult.data.setPeerRelationShip)
                 } else {

@@ -101,7 +101,6 @@ const NEW_FORM_DATA = {
 
 const FormEditor = (props: FormEditorProps): JSX.Element => {    
     const { reactory, formData } = props;
-    debugger;
     const { utils } = reactory;
     const { 
         React, 
