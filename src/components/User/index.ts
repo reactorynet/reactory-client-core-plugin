@@ -1,4 +1,3 @@
-import PasswordResetForm from "./ResetPassword"
 import UserListWithSearchRegistration from "./UserListWithSearch"
 import ProfileComponentRegistration from './Profile';
 import UserProfileRegistration from './Connected/UserProfile';
@@ -12,7 +11,6 @@ export default [
   MembershipRoles,
   CreateUserMembership,
   DemographicsRegistry,
-  PasswordResetForm,
   UserListWithSearchRegistration,
   ProfileComponentRegistration,
   UserProfileRegistration,
