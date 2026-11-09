@@ -19,8 +19,8 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@reactorynet/reactory-core": "1.1.9",
-    "core-js": "^3.1.4",
+    "@reactorynet/reactory-core": "1.1.10",
+    "core-js": "^3.51.0",
     "styled-jsx": ">= 3.x.x"
   },
   "peerDependencies": {
