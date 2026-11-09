@@ -102,7 +102,7 @@
     "i18next": "^21.6.5",
     "inversify": "^6.0.1",
     "localforage": "1.10.0",
-    "mocha": "9.2.2",
+    "mocha": "12.0.3",
     "moment": "^2.29.4",
     "mongodb": "4.5.0",
     "mongoose": "6.8.3",
