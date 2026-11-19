@@ -175,7 +175,7 @@ const Forgot = (props: IForgotComponentProps) => {
             >
               <Icon sx={{ fontSize: 32 }}>mark_email_read</Icon>
             </Avatar>
-            <Typography variant="h5" fontWeight={700} gutterBottom>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
               {reactory.i18n.t('reactory:forgot.email_sent_title', 'Check your inbox')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
@@ -265,7 +265,7 @@ const Forgot = (props: IForgotComponentProps) => {
               >
                 <Icon sx={{ fontSize: 28 }}>help_outline</Icon>
               </Avatar>
-              <Typography variant="h5" fontWeight={700} gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                 {magicLink === false
                   ? reactory.i18n.t('reactory:forgot.heading', 'Reset Password')
                   : reactory.i18n.t('reactory:forgot.magic_heading', 'Get a Magic Link')}
@@ -317,13 +317,13 @@ const Forgot = (props: IForgotComponentProps) => {
                       )
                     : undefined
                 }
-                InputProps={{
+                slotProps={{ input: {
                   startAdornment: (
                     <InputAdornment position="start">
                       <Icon sx={{ color: 'text.secondary' }}>email</Icon>
                     </InputAdornment>
                   ),
-                }}
+                } }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
