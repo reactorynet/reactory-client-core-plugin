@@ -88,7 +88,7 @@ const ReactoryMembershipRoles = (props: ReactoryMembershipRolesProps) => {
         }
 
         if (applicationRole !== 'ANON') {
-          return (<Grid item xs={12} sm={12} md={12} lg={12}>
+          return (<Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
             <FormControlLabel
               control={<Switch size="small" checked={reactory.hasRole([applicationRole], membership.roles)} onChange={onToggleRole} />}
               label={applicationRole}

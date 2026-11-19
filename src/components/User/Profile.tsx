@@ -461,7 +461,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         }
 
         return (
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
                 <Typography variant="h6" color="primary">Memberships</Typography>
                 <Paper sx={getStyle('PaperDefault')}>
                     <StaticContent
@@ -549,7 +549,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
                             {selectedMembership && reactory.$user.applicationRoles.map((applicationRole: string, idx) => {
                                 if (applicationRole !== 'ANON') {
-                                    return (<Grid key={idx} item xs={12} sm={12} md={12} lg={12}>
+                                    return (<Grid key={idx} size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
                                         <FormControlLabel
                                             control={<Switch size="small" checked={reactory.hasRole([applicationRole], selectedMembership.roles)} onChange={(evt) => {
                                                 let roles = [...selectedMembership.roles];
@@ -657,7 +657,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
     const renderUserDemographics = (): JSX.Element | null => {
         const displayDemographics = props.profie && selectedMembership && activeOrganizationId
         const userDemographic = (
-            <Grid item sm={12} xs={12} >
+            <Grid size={{ sm: 12, xs: 12 }} >
                 <Typography sx={getStyle('sectionHeaderText')} variant="h6" color="primary">Demographics</Typography>
                 <Paper sx={getStyle('PaperDefault')}>
                     {displayDemographics ? <UserDemographics 
@@ -992,11 +992,11 @@ const Profile = (props: IProfileProps): JSX.Element => {
                     {/* <Typography variant="h6">My assessors - {this.state.selectedMembership.organization.name}</Typography> */}
                     <Toolbar>
                         <Grid container spacing={2}>
-                            <Grid container item direction="row">
-                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ ...getStyle('assessorsContainerButton'), display: data && Object.keys(data).length > 0 ? 'none' : 'flex' }}>
+                            <Grid container direction="row">
+                                <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }} sx={{ ...getStyle('assessorsContainerButton'), display: data && Object.keys(data).length > 0 ? 'none' : 'flex' }}>
                                     <Typography variant="body2" color={'primary'}>You do not yet have any assessors. Assessors are the employees of your organisation who will be completing surveys for you.</Typography>
                                 </Grid>
-                                <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={data && Object.keys(data).length > 0 ? getStyle('assessorsContainerBtnLeft') : getStyle('assessorsContainerButton')}>
+                                <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }} sx={data && Object.keys(data).length > 0 ? getStyle('assessorsContainerBtnLeft') : getStyle('assessorsContainerButton')}>
                                     <Tooltip title="Click here to add new assessors">
                                         <Button color="secondary" variant="contained" component="span" onClick={editUserSelection} style={{ marginRight: '12px' }}><Icon>add</Icon>ADD ASSESSORS</Button>
                                     </Tooltip>
@@ -1058,7 +1058,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 const selectorWidget = (
                                     <Grid container>
 
-                                        {mustConfirmRemovePeer === false && <Grid item container sm={12} md={12} lg={12} direction="row">
+                                        {mustConfirmRemovePeer === false && <Grid container size={{ sm: 12, md: 12, lg: 12 }} direction="row">
 
                                             <Tooltip title={`${isManager === true ? `${usr.firstName} ${usr.lastName} is flagged as a leader` : `Click to indicate you report to ${usr.firstName} ${usr.lastName}`} `}>
                                                 <IconButton key={0} disabled={isManager === true} onClick={isManager === false ? makeSupervisor : nilf}>
@@ -1085,7 +1085,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                             </Tooltip>
                                         </Grid>}
                                         {
-                                            mustConfirmRemovePeer === true && <Grid item container sm={12} md={12} lg={12} direction="row">
+                                            mustConfirmRemovePeer === true && <Grid container size={{ sm: 12, md: 12, lg: 12 }} direction="row">
                                                 <Typography variant="body1" style={{ marginTop: '6px', marginRight: '14px' }}>Please confirm you wish to remove {usr.firstName} as a {usr.relationship}?</Typography>
                                                 <Button onClick={() => {
                                                     //that.setState({ confirmRemovePeer: null })
@@ -1249,7 +1249,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
         }
 
         const peersComponent = (
-            <Grid item sm={12} xs={12}>
+            <Grid size={{ sm: 12, xs: 12 }}>
                 <Typography variant='h6' color='primary'>Organigram</Typography>
                 {confirmPeersDialog}
                 {addUserDialog}
@@ -1276,8 +1276,8 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
         const defaultFieldProps = {
             fullWidth: true,
-            InputLabelProps: {
-                shrink: true
+            slotProps: {
+                inputLabel: { shrink: true }
             },
         };
 
@@ -1377,16 +1377,16 @@ const Profile = (props: IProfileProps): JSX.Element => {
 
 
         return (
-            <Grid item sm={12} xs={12} xl={12}>
-                <Grid item sm={12} xs={12} alignItems={'flex-start'} display={'flex'} flexDirection={'row'}>
+            <Grid size={{ sm: 12, xs: 12, xl: 12 }}>
+                <Grid size={{ sm: 12, xs: 12 }} sx={{ alignItems: 'flex-start', display: 'flex', flexDirection: 'row' }}>
                     <GoBack /><Typography variant='h6' color="primary">{firstName} {lastName}</Typography>
                 </Grid>
                 <Paper sx={getStyle('PaperDefault')}>
                     <Grid container spacing={4}>
-                        {withAvatar === true && <Grid item sm={12} xs={12}>
+                        {withAvatar === true && <Grid size={{ sm: 12, xs: 12 }}>
                             {avatarComponent}
                         </Grid>}
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                        <Grid size={{ sm: 12, xs: 12, md: 6, lg: 6, xl: 6 }}>
                             <TextField
                                 variant='standard'
                                 {...defaultFieldProps}
@@ -1394,7 +1394,7 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 value={firstName}
                                 onChange={updateFirstname} />
                         </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                        <Grid size={{ sm: 12, xs: 12, md: 6, lg: 6, xl: 6 }}>
                             <TextField
                                 variant='standard'
                                 {...defaultFieldProps}
@@ -1403,21 +1403,21 @@ const Profile = (props: IProfileProps): JSX.Element => {
                                 onChange={updateLastname}
                                 onKeyPressCapture={onSurnameKeyPress} />
                         </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                        <Grid size={{ sm: 12, xs: 12, md: 6, lg: 6, xl: 6 }} >
                             <TextField
                                 variant='standard'
                                 {...defaultFieldProps}
                                 label={emailValid === true ? 'Email Address' : 'Email!'}
                                 value={email} onChange={updateEmail} />
                         </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                        <Grid size={{ sm: 12, xs: 12, md: 6, lg: 6, xl: 6 }} >
                             <TextField
                                 variant='standard'
                                 {...defaultFieldProps}
                                 label='Mobile Number'
                                 value={mobileNumber} onChange={updateMobileNumber} />
                         </Grid>
-                        {isProfileOwner === true && <Grid item sm={12} xs={12} md={6} lg={6} xl={6} >
+                        {isProfileOwner === true && <Grid size={{ sm: 12, xs: 12, md: 6, lg: 6, xl: 6 }} >
                             <Button color='primary' variant='contained' onClick={doSave} disabled={saveDisabled}>{t('common.cta.update', 'UPDATE').toUpperCase()}</Button>
                         </Grid>}
                     </Grid>

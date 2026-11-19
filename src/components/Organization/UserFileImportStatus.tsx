@@ -121,7 +121,7 @@ const UserFileImportStatus = (props) => {
 
 
   const rp = {
-    item: true, xs: 12, sm: 12, md: 6, lg: 6, xl: 6
+    size: { xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }
   }
 
   return (

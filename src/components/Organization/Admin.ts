@@ -174,18 +174,18 @@ class OrganizationForm extends Component {
      * <form>
             <Grid container spacing={8}>
               <Tooltip title="Drag and drop a file on the logo area.">
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   
                 </Grid>
               </Tooltip>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Paper className={classes.root600}>
                   <TextField
                     id="full-width"
                     label="Company Code"
-                    InputLabelProps={{
+                    slotProps={{ inputLabel: {
                       shrink: true,
-                    }}
+                    } }}
                     placeholder="Shortcode"
                     helperText="Please enter company shortcode"
                     fullWidth
@@ -196,9 +196,9 @@ class OrganizationForm extends Component {
                   <TextField
                     id="full-width"
                     label="Company Name"
-                    InputLabelProps={{
+                    slotProps={{ inputLabel: {
                       shrink: true,
-                    }}
+                    } }}
                     placeholder="Company Name"
                     helperText="Please enter a company name"
                     fullWidth
@@ -207,12 +207,12 @@ class OrganizationForm extends Component {
                     value={organization.name} />
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Paper>
   
                 </Paper>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Button type="button" disabled={pristine || submitting || organization.name === ''} onClick={this.updateOrganization}>
                   <SaveIcon />
                   Save

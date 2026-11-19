@@ -75,16 +75,13 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
     LinearProgress,
     Link,
     Paper,
-    // @ts-ignore
-    Grid2,
+    Grid,
     Icon,
     Stack,
     TextField,
     Tooltip,
     Typography,
   } = Material.MaterialCore;
-
-  const Grid = Grid2;
 
   // -- State --
   const [username, setUsername] = React.useState<string>(
@@ -230,13 +227,13 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
                   name="reactory-security::standard-login-email"
                   id="reactory-security::standard-login-email"
                   autoFocus
-                  InputProps={{
+                  slotProps={{ input: {
                     startAdornment: (
                       <InputAdornment position="start">
                         <Icon sx={{ color: 'text.secondary' }}>email</Icon>
                       </InputAdornment>
                     ),
-                  }}
+                  } }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -257,7 +254,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
                   id="reactory-security::standard-login-password"
                   inputRef={passwordRef}
                   disabled={busy}
-                  InputProps={{
+                  slotProps={{ input: {
                     startAdornment: (
                       <InputAdornment position="start">
                         <Icon sx={{ color: 'text.secondary' }}>lock</Icon>
@@ -279,7 +276,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
                         </IconButton>
                       </InputAdornment>
                     ),
-                  }}
+                  } }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -547,7 +544,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
                 >
                   <Icon sx={{ fontSize: 28 }}>lock_outline</Icon>
                 </Avatar>
-                <Typography variant="h5" fontWeight={700} gutterBottom>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                   {reactory.i18n.t('reactory:login.heading', 'Sign In')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -593,8 +590,7 @@ const LoginCard: React.FunctionComponent<IReactoryLoginProps> = (
                       variant="body2"
                       onClick={doRegister}
                       underline="hover"
-                      fontWeight={600}
-                      sx={{ cursor: 'pointer' }}
+                      sx={{ fontWeight: 600, cursor: 'pointer' }}
                     >
                       {reactory.i18n.t(
                         'reactory:login.register_cta',

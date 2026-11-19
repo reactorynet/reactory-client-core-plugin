@@ -135,7 +135,7 @@ class Forgot extends Component {
         {beforeComponent}
         <Paper style={{ padding: '16px' }}>
           <Grid container>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 onChange={updateEmailAddress}
                 onKeyPress={emailKeyPressHandler}
@@ -147,14 +147,14 @@ class Forgot extends Component {
                   "Enter your email address and we will send you link to log in with."
                 }
                 style={{ marginBottom: '50px' }}
-                inputProps={{
+                slotProps={{ htmlInput: {
                   inputProps: {
                     onKeyPress: emailKeyPressHandler
                   }
-                }}
+                } }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Button type="button" onClick={this.goBack} variant="flat"><Icon>keyboard_arrow_left</Icon>&nbsp;BACK</Button>
               <Tooltip title={magicLink === false ? "Click to send a reset email" : "Click to send a magic link to login with"}>
                 <Fab onClick={this.onSubmit} variant="rounded" color="primary" ><Icon>send</Icon></Fab>
