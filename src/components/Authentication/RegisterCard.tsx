@@ -336,7 +336,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
             >
               <Icon sx={{ fontSize: 32 }}>check_circle</Icon>
             </Avatar>
-            <Typography variant="h5" fontWeight={700} gutterBottom>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
               {reactory.i18n.t('reactory:register.success_title', 'Account Created!')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
@@ -418,7 +418,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
               >
                 <Icon sx={{ fontSize: 28 }}>person_add</Icon>
               </Avatar>
-              <Typography variant="h5" fontWeight={700} gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                 {reactory.i18n.t('reactory:register.heading', 'Create Account')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -467,13 +467,13 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                       variant="outlined"
                       placeholder="Your company name"
                       onKeyDown={handleKeyDown}
-                      InputProps={{
+                      slotProps={{ input: {
                         startAdornment: (
                           <InputAdornment position="start">
                             <Icon sx={{ color: 'text.secondary' }}>business</Icon>
                           </InputAdornment>
                         ),
-                      }}
+                      } }}
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                     />
                   )}
@@ -493,13 +493,13 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                       variant="outlined"
                       error={touched.firstName && !!errors.firstName}
                       helperText={touched.firstName ? errors.firstName : undefined}
-                      InputProps={{
+                      slotProps={{ input: {
                         startAdornment: (
                           <InputAdornment position="start">
                             <Icon sx={{ color: 'text.secondary' }}>person</Icon>
                           </InputAdornment>
                         ),
-                      }}
+                      } }}
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                     />
                     <TextField
@@ -536,13 +536,13 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                     autoComplete="email"
                     error={touched.email && !!errors.email}
                     helperText={touched.email ? errors.email : undefined}
-                    InputProps={{
+                    slotProps={{ input: {
                       startAdornment: (
                         <InputAdornment position="start">
                           <Icon sx={{ color: 'text.secondary' }}>email</Icon>
                         </InputAdornment>
                       ),
-                    }}
+                    } }}
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
 
@@ -560,21 +560,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                     fullWidth
                     variant="outlined"
                     autoComplete="username"
-                    inputProps={{ maxLength: 50 }}
-                    error={usernameStatus === 'taken'}
-                    helperText={
-                      usernameStatus === 'checking'
-                        ? reactory.i18n.t('reactory:register.username_checking', 'Checking availability\u2026')
-                        : usernameStatus === 'available'
-                        ? reactory.i18n.t('reactory:register.username_available', 'Username is available')
-                        : usernameStatus === 'taken'
-                        ? reactory.i18n.t('reactory:register.username_taken', 'Username is already taken')
-                        : reactory.i18n.t(
-                            'reactory:register.username_hint',
-                            'Leave blank to use your email address. Letters, numbers and underscores only.',
-                          )
-                    }
-                    FormHelperTextProps={{
+                    slotProps={{ htmlInput: { maxLength: 50 }, formHelperText: {
                       sx: {
                         color:
                           usernameStatus === 'available'
@@ -583,8 +569,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                             ? 'error.main'
                             : 'text.secondary',
                       },
-                    }}
-                    InputProps={{
+                    }, input: {
                       startAdornment: (
                         <InputAdornment position="start">
                           <Icon sx={{ color: 'text.secondary' }}>alternate_email</Icon>
@@ -599,7 +584,20 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                           <Icon sx={{ color: 'success.main' }}>check_circle</Icon>
                         </InputAdornment>
                       ) : null,
-                    }}
+                    } }}
+                    error={usernameStatus === 'taken'}
+                    helperText={
+                      usernameStatus === 'checking'
+                        ? reactory.i18n.t('reactory:register.username_checking', 'Checking availability\u2026')
+                        : usernameStatus === 'available'
+                        ? reactory.i18n.t('reactory:register.username_available', 'Username is available')
+                        : usernameStatus === 'taken'
+                        ? reactory.i18n.t('reactory:register.username_taken', 'Username is already taken')
+                        : reactory.i18n.t(
+                            'reactory:register.username_hint',
+                            'Leave blank to use your email address. Letters, numbers and underscores only.',
+                          )
+                    }
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
 
@@ -666,7 +664,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                     autoComplete="new-password"
                     error={touched.password && !!errors.password}
                     helperText={touched.password ? errors.password : undefined}
-                    InputProps={{
+                    slotProps={{ input: {
                       startAdornment: (
                         <InputAdornment position="start">
                           <Icon sx={{ color: 'text.secondary' }}>lock</Icon>
@@ -685,7 +683,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                           </IconButton>
                         </InputAdornment>
                       ),
-                    }}
+                    } }}
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
 
@@ -738,7 +736,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                     helperText={
                       touched.passwordConfirm ? errors.passwordConfirm : undefined
                     }
-                    InputProps={{
+                    slotProps={{ input: {
                       startAdornment: (
                         <InputAdornment position="start">
                           <Icon sx={{ color: 'text.secondary' }}>lock_outline</Icon>
@@ -761,7 +759,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                           </IconButton>
                         </InputAdornment>
                       ),
-                    }}
+                    } }}
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
 
@@ -831,8 +829,7 @@ const RegisterCard: React.FunctionComponent<IRegisterProps> = (props) => {
                   variant="body2"
                   onClick={() => navigate('/login')}
                   underline="hover"
-                  fontWeight={600}
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
                 >
                   {reactory.i18n.t('reactory:register.login_cta', 'Sign In')}
                 </Link>

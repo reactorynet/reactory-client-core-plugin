@@ -22,12 +22,7 @@ const UserImportButton = (props: any) => {
   const { Button, Icon, Grid, Typography } = MaterialCore;
 
   const rowprops = {
-    item: true,
-    xs: 12,
-    sm: 12,
-    md: 12,
-    lg: 12,
-    xl: 12
+    size: { xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }
   }
 
   const UserImportResults = () => {

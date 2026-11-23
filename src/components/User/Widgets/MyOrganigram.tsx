@@ -623,7 +623,7 @@ class MyOrganigram extends Component<any, any> {
 
         const peersComponent = (
             <Fragment>
-                <Grid item sm={12} xs={12}>
+                <Grid size={{ sm: 12, xs: 12 }}>
                     {confirmPeersDialog}
                     {addUserDialog}
                     {
