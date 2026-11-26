@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FunctionComponent } from 'react';
 import Reactory from '@reactorynet/reactory-core';
 import { ReactoryClientCore } from 'types';
 
@@ -9,8 +9,10 @@ const ReactoryUserProfileGeneral = (props: ReactoryClientCore.Components.Reactor
       i18n,
       getUser,
     } = reactory;
-    const { ReactoryForm } = reactory.getComponents<{
-      ReactoryForm: React.FunctionComponent<Reactory.Client.IReactoryFormProps>,
+    // JSX must use the app's React from the registry, not a bundled copy.
+    const { React, ReactoryForm } = reactory.getComponents<{
+      React: Reactory.React,
+      ReactoryForm: FunctionComponent<Reactory.Client.IReactoryFormProps>,
     } >([
       'react.React',
       'core.ReactoryForm'

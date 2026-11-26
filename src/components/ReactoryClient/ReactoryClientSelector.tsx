@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { nameSpace } from '../../constants'
-const dependencies = ['material-ui.Material', 'core.ReactoryForm', 'core.DropDownMenu'];
+const dependencies = ['react.React', 'material-ui.Material', 'core.ReactoryForm', 'core.DropDownMenu'];
 
 /**
  * Selector Widget that will provide a list of organizations that the
@@ -29,6 +29,9 @@ class ReactoryClientSelector extends React.Component {
     }
 
     render() {
+        // JSX must use the app's React from the registry. Elements created by the
+        // React bundled into this plugin are not valid children for React 19.
+        const { React } = this.components;
         try {
 
             const self = this;

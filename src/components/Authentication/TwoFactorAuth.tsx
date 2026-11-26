@@ -338,7 +338,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
                   {verified ? 'verified_user' : 'security'}
                 </Icon>
               </Avatar>
-              <Typography variant="h5" fontWeight={700} gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                 {reactory.i18n.t(
                   'reactory:2fa.heading',
                   'Two-Factor Authentication',
@@ -353,8 +353,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
               {email && (
                 <Typography
                   variant="body2"
-                  fontWeight={600}
-                  sx={{ mt: 0.5 }}
+                  sx={{ fontWeight: 600, mt: 0.5 }}
                 >
                   {email}
                 </Typography>
@@ -391,8 +390,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
             <Stack
               direction="row"
               spacing={1}
-              justifyContent="center"
-              sx={{ mb: 3 }}
+              sx={{ justifyContent: 'center', mb: 3 }}
             >
               {digits.map((digit, index) => (
                 <TextField
@@ -406,7 +404,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
                   onPaste={index === 0 ? handlePaste : undefined}
                   disabled={busy || verified}
                   variant="outlined"
-                  inputProps={{
+                  slotProps={{ htmlInput: {
                     maxLength: index === 0 ? codeLength : 1,
                     style: {
                       textAlign: 'center',
@@ -419,7 +417,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
                     inputMode: 'numeric',
                     autoComplete: index === 0 ? 'one-time-code' : 'off',
                     'aria-label': `Digit ${index + 1} of ${codeLength}`,
-                  }}
+                  } }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -479,8 +477,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
                   variant="body2"
                   onClick={handleResend}
                   underline="hover"
-                  fontWeight={600}
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ fontWeight: 600, cursor: 'pointer' }}
                 >
                   {reactory.i18n.t(
                     'reactory:2fa.resend',
@@ -493,7 +490,7 @@ const TwoFactorAuth: React.FunctionComponent<ITwoFactorProps> = (props) => {
                     'reactory:2fa.resend_countdown',
                     'Resend code in',
                   )}{' '}
-                  <Box component="span" fontWeight={600}>
+                  <Box component="span" sx={{ fontWeight: 600 }}>
                     {formatTime(countdown)}
                   </Box>
                 </Typography>
